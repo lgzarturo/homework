@@ -9,8 +9,8 @@ var app = {};
 
 // Inicializar
 app.init = function () {
-	// Ejecuta el servidor
-	_server.init();
+  // Ejecuta el servidor
+  _server.init();
 
 };
 
