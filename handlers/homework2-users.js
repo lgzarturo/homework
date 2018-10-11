@@ -61,18 +61,28 @@ handlers._users.post = function (data, callback) {
 	
 };
 
-// Users - get (URI: /users/{id})
+// Users - get (URI: /users?email={email})
 handlers._users.get = function (data, callback) {
   var email = typeof(data.queryStringObject.email) == 'string' && data.queryStringObject.email.trim().length > 0 ? data.queryStringObject.email.trim() : false;
   if (email) {
-    _data.read('users', email, function (err, data) {
-      if (!err && data) {
-        delete data.password;
-        callback(200, data);
+    var token = typeof(data.headers.token) == 'string' ? data.headers.token : false;
+    _helpers.verifyToken(token, email, function (isValid) {
+      if (isValid) {
+
+        _data.read('users', email, function (err, data) {
+          if (!err && data) {
+            delete data.password;
+            callback(200, data);
+          } else {
+            callback(400);
+          }
+        });    
+
       } else {
-        callback(400);
+        callback(403, {'Error': 'El token es requerido o ya no es valido.'});
       }
     });
+    
   } else {
     callback(400, {'Error': 'Faltan parametros requeridos.'});
   }
@@ -87,59 +97,83 @@ handlers._users.put = function (data, callback) {
   var streetAddress = typeof(data.payload.streetAddress) == 'string' ? data.payload.streetAddress.trim() : false;
 
   if (email) {
+    var token = typeof(data.headers.token) == 'string' ? data.headers.token : false;
+    _helpers.verifyToken(token, email, function (isValid) {
+      if (isValid) {
 
-    if (name || password || streetAddress) {
-      _data.read('users', email, function (err, data) {
-        if (!err && data) {
-          if (name) {
-            data.name = name;
-          }
-          if (password) {
-            data.password = _helpers.hash(password);
-          }
-          if (streetAddress) {
-            data.streetAddress = streetAddress;
-          }
-
-          _data.update('users', email, data, function (err) {
-            if (!err) {
-              callback(200);
-            } else{
-              callback(500, {'Error': 'No se pudo actualizar el usuario.'});
+        if (name || password || streetAddress) {
+          _data.read('users', email, function (err, data) {
+            if (!err && data) {
+              if (name) {
+                data.name = name;
+              }
+              if (password) {
+                data.password = _helpers.hash(password);
+              }
+              if (streetAddress) {
+                data.streetAddress = streetAddress;
+              }
+    
+              _data.update('users', email, data, function (err) {
+                if (!err) {
+                  callback(200);
+                } else{
+                  callback(500, {'Error': 'No se pudo actualizar el usuario.'});
+                }
+              });
+            } else {
+              callback(400, {'Error': 'El usuario especificado no existe.'});
             }
+            console.log(data);
           });
         } else {
-          callback(400, {'Error': 'El usuario especificado no existe.'});
+          callback(400, {'Error': 'Faltan parametros requeridos.'});
         }
-        console.log(data);
-      });
-    } else {
-      callback(400, {'Error': 'Faltan parametros requeridos.'});
-    }
+
+      } else {
+        callback(403, {'Error': 'El token es requerido o ya no es valido.'});
+      }
+    });
 
   } else {
     callback(400, {'Error': 'Faltan parametros requeridos.'});
   }
 };
 
-// Users - delete (URI: /users/{id})
+// Users - delete (URI: /users?email={email})
 handlers._users.delete = function (data, callback) {
   var email = typeof(data.queryStringObject.email) == 'string' && data.queryStringObject.email.trim().length > 0 ? data.queryStringObject.email.trim() : false;	
 
   if (email) {
-    _data.read('users', email, function(err, data) {
-      if (!err && data) {
-        _data.delete('users', email, function(err) {
-          if (!err) {
-            callback(200);
+    var token = typeof(data.headers.token) == 'string' ? data.headers.token : false;
+    _helpers.verifyToken(token, email, function (isValid) {
+      if (isValid) {
+
+        _data.read('users', email, function(err, data) {
+          if (!err && data) {
+            _data.delete('users', email, function(err) {
+              if (!err) {
+                _data.delete('tokens', token, function (err) { 
+                  if (!err) {
+                    callback(200);
+                  } else {
+                    callback(200, {'Error': 'El usuario ya no existe, este token es invalido'});
+                  }
+                });              
+              } else {
+                callback(400, {'Error': 'No se pudo eliminar el usuario especificado.'});    
+              }
+            });
           } else {
-            callback(400, {'Error': 'No se pudo eliminar el usuario especificado.'});    
+            callback(400, {'Error': 'El usuario especificado no existe.'});
           }
         });
+
       } else {
-        callback(400, {'Error': 'El usuario especificado no existe.'});
+        callback(403, {'Error': 'El token es requerido o ya no es valido.'});
       }
     });
+
   }
 };
 
