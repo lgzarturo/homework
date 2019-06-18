@@ -2,6 +2,7 @@
 logs
 *.log
 *.gz.b64
+.idea
 
 # Data
 *.json

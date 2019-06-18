@@ -24,8 +24,8 @@ handlers._users = {};
 // Users - post (URI: /users)
 // Parametros: name, email address, password, and street address
 handlers._users.post = function (data, callback) {
-  var name = typeof(data.payload.name) == 'string' && data.payload.name.trim().length > 0 ? data.payload.name.trim() : false;  
-  var email = typeof(data.payload.email) == 'string' && data.payload.email.trim().length > 0 ? data.payload.email.trim() : false;	
+  var name = typeof(data.payload.name) == 'string' && data.payload.name.trim().length > 0 ? data.payload.name.trim() : false;
+  var email = typeof(data.payload.email) == 'string' && data.payload.email.trim().length > 0 ? data.payload.email.trim() : false;
   var password = typeof(data.payload.password) == 'string' && data.payload.password.trim().length > 0 ? data.payload.password.trim() : false;
   var streetAddress = typeof(data.payload.streetAddress) == 'string' ? data.payload.streetAddress.trim() : false;
 
@@ -58,7 +58,7 @@ handlers._users.post = function (data, callback) {
   } else {
     callback(400, {'Error': 'Faltan parametros requeridos.'});
   }
-	
+
 };
 
 // Users - get (URI: /users?email={email})
@@ -76,23 +76,23 @@ handlers._users.get = function (data, callback) {
           } else {
             callback(400);
           }
-        });    
+        });
 
       } else {
         callback(403, {'Error': 'El token es requerido o ya no es valido.'});
       }
     });
-    
+
   } else {
     callback(400, {'Error': 'Faltan parametros requeridos.'});
   }
 };
 
-// Users - put (URI: /users)
+// Users - put (URI: /users?email={email})
 handlers._users.put = function (data, callback) {
-  var email = typeof(data.queryStringObject.email) == 'string' && data.queryStringObject.email.trim().length > 0 ? data.queryStringObject.email.trim() : false;	
+  var email = typeof(data.queryStringObject.email) == 'string' && data.queryStringObject.email.trim().length > 0 ? data.queryStringObject.email.trim() : false;
 
-  var name = typeof(data.payload.name) == 'string' && data.payload.name.trim().length > 0 ? data.payload.name.trim() : false;    
+  var name = typeof(data.payload.name) == 'string' && data.payload.name.trim().length > 0 ? data.payload.name.trim() : false;
   var password = typeof(data.payload.password) == 'string' && data.payload.password.trim().length > 0 ? data.payload.password.trim() : false;
   var streetAddress = typeof(data.payload.streetAddress) == 'string' ? data.payload.streetAddress.trim() : false;
 
@@ -113,7 +113,7 @@ handlers._users.put = function (data, callback) {
               if (streetAddress) {
                 data.streetAddress = streetAddress;
               }
-    
+
               _data.update('users', email, data, function (err) {
                 if (!err) {
                   callback(200);
@@ -142,7 +142,7 @@ handlers._users.put = function (data, callback) {
 
 // Users - delete (URI: /users?email={email})
 handlers._users.delete = function (data, callback) {
-  var email = typeof(data.queryStringObject.email) == 'string' && data.queryStringObject.email.trim().length > 0 ? data.queryStringObject.email.trim() : false;	
+  var email = typeof(data.queryStringObject.email) == 'string' && data.queryStringObject.email.trim().length > 0 ? data.queryStringObject.email.trim() : false;
 
   if (email) {
     var token = typeof(data.headers.token) == 'string' ? data.headers.token : false;
@@ -153,15 +153,15 @@ handlers._users.delete = function (data, callback) {
           if (!err && data) {
             _data.delete('users', email, function(err) {
               if (!err) {
-                _data.delete('tokens', token, function (err) { 
+                _data.delete('tokens', token, function (err) {
                   if (!err) {
                     callback(200);
                   } else {
                     callback(200, {'Error': 'El usuario ya no existe, este token es invalido'});
                   }
-                });              
+                });
               } else {
-                callback(400, {'Error': 'No se pudo eliminar el usuario especificado.'});    
+                callback(400, {'Error': 'No se pudo eliminar el usuario especificado.'});
               }
             });
           } else {

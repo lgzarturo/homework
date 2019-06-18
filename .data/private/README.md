@@ -14,7 +14,7 @@ api-keys.json
     "protocol" : "https:",
     "host" : "api.mailgun.net",
     "from" : "postmaster@create_your_sandbox.mailgun.org",
-    "apiKey" : "create_your_mailgun_api_key",
+    "secretKey" : "create_your_mailgun_api_key",
     "domainName" : "create_your_sandbox.mailgun.org"
   }
 }

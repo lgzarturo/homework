@@ -21,7 +21,7 @@ handlers.items = function (data, callback) {
 
 handlers._items = {};
 
-// Items - get (URI: /items?code={code})
+// Items - get (URI: /menu?code={code})
 handlers._items.get = function (data, callback) {
   var token = typeof(data.headers.token) == 'string' ? data.headers.token : false;
   var email = typeof(data.headers.email) == 'string' && data.headers.email.trim().length > 0 ? data.headers.email : false;
@@ -39,7 +39,7 @@ handlers._items.get = function (data, callback) {
         } else {
           callback(400);
         }
-      });    
+      });
 
     } else {
       callback(403, {'Error': 'El token es requerido o ya no es valido.'});

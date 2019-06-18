@@ -61,7 +61,7 @@ handlers._tokens.post = function (data, callback) {
 
 // Tokens - get (URI: /tokens?token={token})
 handlers._tokens.get = function (data, callback) {
-  var token = typeof(data.queryStringObject.token) == 'string' && data.queryStringObject.token.trim().length == _config.tokenSize ? data.queryStringObject.token.trim() : false; 
+  var token = typeof(data.queryStringObject.token) == 'string' && data.queryStringObject.token.trim().length == _config.tokenSize ? data.queryStringObject.token.trim() : false;
   if (token) {
     _data.read('tokens', token, function (err, data) {
       if (!err && data) {
@@ -85,7 +85,7 @@ handlers._tokens.put = function (data, callback) {
       if (!err && data) {
         if (data.expires > Date.now()) {
           data.expires = Date.now() + _config.tokenDuration;
-          _data.update('tokens', data, function (err) {
+          _data.update('tokens', token, data, function (err) {
             if (!err) {
               callback(200, data);
             } else {
@@ -94,7 +94,7 @@ handlers._tokens.put = function (data, callback) {
             }
           });
         } else {
-          callback(400, {'Error': 'El token ya caduco, no puede ser extendido.'});  
+          callback(400, {'Error': 'El token ya caduco, no puede ser extendido.'});
         }
       } else {
         callback(400, {'Error': 'El token especificado es invalido.'});
@@ -107,7 +107,7 @@ handlers._tokens.put = function (data, callback) {
 
 // Tokens - delete (URI: /tokens?token={token})
 handlers._tokens.delete = function (data, callback) {
-  var token = typeof(data.queryStringObject.token) == 'string' && data.queryStringObject.token.trim().length == _config.tokenSize ? data.payload.token.trim() : false;
+  var token = typeof(data.queryStringObject.token) == 'string' && data.queryStringObject.token.trim().length == _config.tokenSize ? data.queryStringObject.token.trim() : false;
   if (token) {
     _data.read('tokens', token, function (err, data) {
       if (!err && data) {
