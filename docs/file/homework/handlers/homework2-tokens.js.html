@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">homework/handlers/homework2-tokens.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  </ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">homework/handlers/homework2-tokens.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * Homework 2 - Controlador del CRUD Token
+ */
+
+// Dependencias de la aplicaci&#xF3;n
+let _config = require(&apos;./../config/config&apos;);
+let _data = require(&apos;./../lib/data&apos;);
+let _helpers = require(&apos;./../lib/helpers&apos;);
+
+// Controlador dependiendo la solicitud URI
+let handlers = {};
+
+/**
+ * Manejo de los metodos que seran aceptados en el controlador.
+ * @param data
+ * @param callback
+ */
+handlers.tokens = function (data, callback) {
+    let acceptableMethods = [&apos;post&apos;, &apos;get&apos;, &apos;put&apos;, &apos;delete&apos;];
+    if (acceptableMethods.indexOf(data.method) &gt; -1) {
+        handlers._tokens[data.method](data, callback);
+    } else {
+        callback(405);
+    }
+};
+
+handlers._tokens = {};
+
+/**
+ * Tokens - post (URI: /tokens)
+ * @param data
+ * @param callback
+ */
+handlers._tokens.post = function (data, callback) {
+    // Validar los par&#xE1;metros de la solicitud.
+    let email = typeof (data.payload.email) == &apos;string&apos; ? data.payload.email.trim() : false;
+    let password = typeof (data.payload.password) == &apos;string&apos; &amp;&amp; data.payload.password.trim().length &gt; 0 ? data.payload.password.trim() : false;
+
+    if (email &amp;&amp; password) {
+        _data.read(&apos;users&apos;, email, function (err, user) {
+            if (!err &amp;&amp; user) {
+                let hashedPassword = _helpers.hash(password);
+                if (hashedPassword === user.password) {
+                    let token = _helpers.createRandomString(_config.tokenSize);
+                    let expires = Date.now() + _config.tokenDuration;
+                    let object = {
+                        &apos;email&apos;: email,
+                        &apos;token&apos;: token,
+                        &apos;expires&apos;: expires
+                    };
+
+                    _data.create(&apos;tokens&apos;, token, object, function (err) {
+                        if (!err) {
+                            callback(200, object);
+                        } else {
+                            callback(401, {&apos;Error&apos;: &apos;No se pudo generar un token valido&apos;});
+                        }
+                    });
+                } else {
+                    callback(409, {&apos;Error&apos;: &apos;No se pudo verificar la validez del password.&apos;});
+                }
+            } else {
+                callback(404, {&apos;Error&apos;: &apos;No se encontro el usuario seleccionado.&apos;});
+            }
+        });
+    } else {
+        callback(400, {&apos;Error&apos;: &apos;Faltan parametros para continuar con la solicitud.&apos;});
+    }
+};
+
+/**
+ * Tokens - get (URI: /tokens?token={?})
+ * @param data
+ * @param callback
+ */
+handlers._tokens.get = function (data, callback) {
+    // Validar los par&#xE1;metros de la solicitud.
+    let token = typeof (data.queryStringObject.token) === &apos;string&apos; &amp;&amp; data.queryStringObject.token.trim().length === _config.tokenSize ? data.queryStringObject.token.trim() : false;
+
+    if (token) {
+        _data.read(&apos;tokens&apos;, token, function (err, data) {
+            if (!err &amp;&amp; data) {
+                callback(200, data);
+            } else {
+                callback(404, {&apos;Error&apos;: &apos;No se pudo encontrar el token del usuario especificado&apos;});
+            }
+        });
+    } else {
+        callback(400, {&apos;Error&apos;: &apos;No se puede validar la solicitud.&apos;});
+    }
+};
+
+/**
+ * Tokens - put (URI: /tokens)
+ * @param data
+ * @param callback
+ */
+handlers._tokens.put = function (data, callback) {
+    // Validar los par&#xE1;metros de la solicitud.
+    let token = typeof (data.payload.token) === &apos;string&apos; &amp;&amp; data.payload.token.trim().length === _config.tokenSize ? data.payload.token.trim() : false;
+    let extended = typeof (data.payload.extend) === &apos;boolean&apos; ? data.payload.extend : false;
+
+    if (token &amp;&amp; extended) {
+        _data.read(&apos;tokens&apos;, token, function (err, data) {
+            if (!err &amp;&amp; data) {
+                if (data.expires &gt; Date.now()) {
+                    data.expires = Date.now() + _config.tokenDuration;
+                    _data.update(&apos;tokens&apos;, token, data, function (err) {
+                        if (!err) {
+                            callback(200, data);
+                        } else {
+                            callback(409, {&apos;Error&apos;: &apos;No se pudo actualizar el token&apos;});
+                        }
+                    });
+                } else {
+                    callback(401, {&apos;Error&apos;: &apos;El token ya caduco, no puede ser extendido.&apos;});
+                }
+            } else {
+                callback(401, {&apos;Error&apos;: &apos;El token especificado es invalido.&apos;});
+            }
+        });
+    } else {
+        callback(400, {&apos;Error&apos;: &apos;Faltan parametros, la solicitud es invalida.&apos;});
+    }
+};
+
+/**
+ * Tokens - delete (URI: /tokens?token={?})
+ * @param data
+ * @param callback
+ */
+handlers._tokens.delete = function (data, callback) {
+    // Validar los par&#xE1;metros de la solicitud.
+    let token = typeof (data.queryStringObject.token) === &apos;string&apos; &amp;&amp; data.queryStringObject.token.trim().length === _config.tokenSize ? data.queryStringObject.token.trim() : false;
+
+    if (token) {
+        _data.read(&apos;tokens&apos;, token, function (err, data) {
+            if (!err &amp;&amp; data) {
+                _data.delete(&apos;tokens&apos;, token, function (err) {
+                    if (!err) {
+                        callback(204);
+                    } else {
+                        callback(404, {&apos;Error&apos;: &apos;No se pudo encontrar el token especificado.&apos;});
+                    }
+                });
+            } else {
+                callback(404, {&apos;Error&apos;: &apos;No se pudo encontrar el token especificado.&apos;});
+            }
+        });
+    } else {
+        callback(400, {&apos;Error&apos;: &apos;Faltan parametros para continuar con la solicitud.&apos;});
+    }
+};
+
+module.exports = handlers;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

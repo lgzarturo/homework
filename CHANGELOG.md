@@ -7,6 +7,16 @@ Tareas de curso de Node JS
 
 ### Added
 
+- Se agregaron los centavos en las transacciones del Stripe.
+- Se agrego el reenvió del comprobante de pago, mediante el número de orden.
+- Se modificaron las definiciones de las variables [Airbnb JavaScript Style](https://github.com/airbnb/javascript).
+- Se incluye la documentación de las funciones del código.
+- Se cambiaron las respuestas de los codigos de la API, para que [cumplan con un estandar](https://www.restapitutorial.com/httpstatuscodes.html). 
+
+## 17-06-2019
+
+### Added
+
 - Se valido el funcionamiento del API mediante Postman
 - /hello: La ruta de la tarea 1.
 - /pizza: El acceso a la creación del registro en el log.

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl">
+  <title data-ice="title">Home</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  </ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><h1 id="homeworks-sobre-masterclass-nodejs">Homeworks sobre MasterClass NodeJS</h1><h2 id="homework-1">Homework 1</h2><p>Paso 1 : Se cargan las dependencias (http y url)
+Paro 2 : Se instancia el servidor HTTP y se inician los eventos &apos;data&apos; y &apos;end&apos; para procesar la solicitud.</p>
+<ul>
+<li>Escucha activa del servidor en el puerto 3000</li>
+<li>Se define el controlador dependiendo la solicitud URI</li>
+<li>Se establece un Objeto con las rutas disponibles</li>
+</ul>
+<p>Paso 3 : Se determina cual es la ruta a procesar
+Paso 4 : Se ejecuta el controlador adecuado dependiendo la petici&#xF3;n (uri)
+Paso 5 : Se retorna el objeto en String JSON y el c&#xF3;digo correspondiente.</p>
+<h2 id="homework-2">Homework 2</h2><p>API Entrega de Pizza</p>
+<ul>
+<li>Creaci&#xF3;n de usuarios (CRUD)</li>
+<li>Los usuario podr&#xE1;n ingresar a la API mediante un token</li>
+<li>Cuando un usuario esta logeado, podr&#xE1; descargar el men&#xFA; y llenar un carrito de compras</li>
+<li>Los usuarios podr&#xE1;n crear ordenes de compra y realizar su pago con Stripe</li>
+<li>Se debe enviar notificaciones por correo mediante Mailgun</li>
+</ul>
+<h3 id="validaci&#xF3;n-de-la-tarea-2">Validaci&#xF3;n de la tarea 2</h3><p>Se valido el funcionamiento del API mediante Postman</p>
+<ul>
+<li>/hello: La ruta de la tarea 1.</li>
+<li>/pizza: El acceso a la creaci&#xF3;n del registro en el log.</li>
+</ul>
+<h4 id="tareas">Tareas</h4><h5 id="1--new-users-can-be-created--their-information-can-be-edited--and-they-can-be-deleted--we-should-store-their-name--email-address--and-street-address">1. New users can be created, their information can be edited, and they can be deleted. We should store their name, email address, and street address</h5><ul>
+<li>/users: El CRUD funciona correctamente para la administraci&#xF3;n de usuarios.</li>
+</ul>
+<h5 id="2--users-can-log-in-and-log-out-by-creating-or-destroying-a-token">2. Users can log in and log out by creating or destroying a token</h5><ul>
+<li>/tokens: Las rutas de esta API se verificaron para que se valide a los usuarios con el objetivo de obtener el token valido para realizar las operaciones en el sistema.</li>
+</ul>
+<h5 id="3--when-a-user-is-logged-in--they-should-be-able-to-get-all-the-possible-menu-items--these-items-can-be-hardcoded-into-the-system-">3. When a user is logged in, they should be able to GET all the possible menu items (these items can be hardcoded into the system)</h5><ul>
+<li>/menu: Se obtienen todos los items del menu guardado en el archivo .data/items/menu.json</li>
+<li>/menu?code=?: Con el par&#xE1;metro code se obtiene el item deseado.</li>
+</ul>
+<h5 id="4--a-logged-in-user-should-be-able-to-fill-a-shopping-cart-with-menu-items">4. A logged-in user should be able to fill a shopping cart with menu items</h5><ul>
+<li>/shopping-cart: Con el m&#xE9;todo get se obtien el listado de items del carrito de compras y con el m&#xE9;todo post se agregan elementos al carrito.</li>
+</ul>
+<h5 id="5--a-logged-in-user-should-be-able-to-create-an-order--you-should-integrate-with-the-sandbox-of-stripe-com-to-accept-their-payment--note--use-the-stripe-sandbox-for-your-testing--follow-this-link-and-click-on-the--quot-tokens-quot--tab-to-see-the-fake-tokens-you-can-use-server-side-to-confirm-the-integration-is-working---a-href--https---stripe-com-docs-testing-cards--stripe-com--a-">5. A logged-in user should be able to create an order. You should integrate with the Sandbox of Stripe.com to accept their payment. Note: Use the stripe sandbox for your testing. Follow this link and click on the &quot;tokens&quot; tab to see the fake tokens you can use server-side to confirm the integration is working: <a href="https://stripe.com/docs/testing#cards">Stripe.com</a></h5><ul>
+<li>/payments: se agregan los datos de la tarjeta de credito de pruebas
+<code>{
+  &quot;creditCart&quot;: &quot;4242424242424242&quot;,
+  &quot;validMonth&quot;: &quot;12&quot;,
+  &quot;validYear&quot;: &quot;2020&quot;,
+  &quot;codeCard&quot;: &quot;716&quot;
+}</code></li>
+</ul>
+<h5 id="6--when-an-order-is-placed--you-should-email-the-user-a-receipt--you-should-integrate-with-the-sandbox-of-mailgun-com-for-this--note--every-mailgun-account-comes-with-a-sandbox-email-account-domain---a-href--mailto-whatever-sandbox123-mailgun-org--whatever-sandbox123-mailgun-org--a---that-you-can-send-from-by-default--so--there--39-s-no-need-to-setup-any-dns-for-your-domain-for-this-task--a-href--https---documentation-mailgun-com-en-latest-faqs-html-how-do-i-pick-a-domain-name-for-my-mailgun-account--mailgun-com--a-">6. When an order is placed, you should email the user a receipt. You should integrate with the sandbox of Mailgun.com for this. Note: Every Mailgun account comes with a sandbox email account domain (<a href="mailto:whatever@sandbox123.mailgun.org">whatever@sandbox123.mailgun.org</a>) that you can send from by default. So, there&apos;s no need to setup any DNS for your domain for this task <a href="https://documentation.mailgun.com/en/latest/faqs.html#how-do-i-pick-a-domain-name-for-my-mailgun-account">Mailgun.com</a></h5><ul>
+<li>/payments: al procesar el pago de la orden se envia un correo con la confirmaci&#xF3;n.</li>
+<li>/payments?order=?: se solicita el reenvio de la orden</li>
+</ul>
+</div>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

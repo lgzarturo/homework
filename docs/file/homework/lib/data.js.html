@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">homework/lib/data.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  </ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">homework/lib/data.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * Library for storing and editing data
+ */
+
+// Dependencias
+let fs = require(&apos;fs&apos;);
+let path = require(&apos;path&apos;);
+
+// Dependencias de la aplicaci&#xF3;n
+let _helpers = require(&apos;./helpers&apos;);
+
+let lib = {};
+
+// Define el directorio base para los datos
+lib.baseDir = path.join(__dirname, &apos;/../.data/&apos;);
+
+// Escribir datos en el archivo
+lib.create = function (dir, file, data, callback) {
+    // Abrir el archivo para lectura
+    fs.open(`${lib.baseDir}${dir}/${file}.json`, &apos;wx&apos;, function (err, fileDescriptor) {
+        if (!err &amp;&amp; fileDescriptor) {
+            let stringData = JSON.stringify(data);
+
+            // Escribir en el archivo y cerrarlo
+            fs.writeFile(fileDescriptor, stringData, function (err) {
+                if (!err) {
+                    fs.close(fileDescriptor, function (err) {
+                        if (!err) {
+                            callback(false);
+                        } else {
+                            callback(&apos;Error al cerrar el nuevo archivo.&apos;);
+                        }
+                    });
+                } else {
+                    callback(&apos;Error al escribir en el nuevo archivo.&apos;);
+                }
+            });
+        } else {
+            callback(&apos;No se puede crear el archivo, el archivo ya existe.&apos;);
+        }
+    });
+};
+
+// Leer la informaci&#xF3;n del archivo
+lib.read = function (dir, file, callback) {
+    fs.readFile(`${lib.baseDir}${dir}/${file}.json`, &apos;utf-8&apos;, function (err, data) {
+        if (!err &amp;&amp; data) {
+            let object = {};
+
+            try {
+                object = _helpers.parseJsonToObject(data);
+            } catch (e) {
+                console.log(`${lib.baseDir}${dir}/${file}.json`);
+                console.log(&apos;data.read -&gt; Error al intentar parsear la informaci&#xF3;n del archivo&apos;);
+                console.log(e);
+            }
+            callback(false, object);
+        } else {
+            callback(err, data);
+        }
+    });
+};
+
+// Actualizar informaci&#xF3;n del archivo
+lib.update = function (dir, file, data, callback) {
+    // Abrir el archivo para escritura
+    fs.open(`${lib.baseDir}${dir}/${file}.json`, &apos;r+&apos;, function (err, fileDescriptor) {
+        if (!err &amp;&amp; fileDescriptor) {
+            let stringData = JSON.stringify(data);
+
+            // Truncar el archivo
+            fs.truncate(fileDescriptor, function (err) {
+                if (!err) {
+                    fs.writeFile(fileDescriptor, stringData, function (err) {
+                        if (!err) {
+                            fs.close(fileDescriptor, function (err) {
+                                if (!err) {
+                                    callback(false);
+                                } else {
+                                    callback(&apos;Error al cerrar el nuevo archivo.&apos;);
+                                }
+                            });
+                        } else {
+                            callback(&apos;Error al escribir en el archivo.&apos;);
+                        }
+                    });
+                } else {
+                    callback(&apos;Error al truncar el archivo.&apos;);
+                }
+            });
+        } else {
+            console.log(`${lib.baseDir}${dir}/${file}.json`);
+            callback(&apos;No se puede actualizar el archivo.&apos;);
+        }
+
+    });
+};
+
+// Eliminar el archivo
+lib.delete = function (dir, file, callback) {
+    fs.unlink(`${lib.baseDir}${dir}/${file}.json`, function (err) {
+        if (!err) {
+            callback(false);
+        } else {
+            callback(&apos;Error al intentar borrar el archivo&apos;);
+        }
+    });
+};
+
+// Listar todos los archivos del directorio
+lib.list = function (dir, callback) {
+    fs.readdir(`${lib.baseDir}${dir}/`, function (err, data) {
+        if (!err &amp;&amp; data &amp;&amp; data.length &gt; 0) {
+            let trimmedFileNames = [];
+            data.forEach(function (fileName) {
+                trimmedFileNames.push(fileName.replace(&apos;.json&apos;, &apos;&apos;));
+            });
+            callback(false, trimmedFileNames);
+        } else {
+            callback(err, data);
+        }
+    });
+};
+
+module.exports = lib;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">homework/lib/logs.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  </ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">homework/lib/logs.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * Logs
+ */
+
+// Dependencias
+let fs = require(&apos;fs&apos;);
+let path = require(&apos;path&apos;);
+let zlib = require(&apos;zlib&apos;);
+
+let lib = {};
+
+// Define el directorio base
+lib.baseDir = path.join(__dirname, &apos;/../.logs/&apos;);
+
+// Agrega una cadena al archivo, crear el archivo si no existe
+lib.append = function (file, str, callback) {
+    fs.open(`${lib.baseDir}${file}.log`, &apos;a&apos;, function (err, fileDescriptor) {
+        if (!err &amp;&amp; fileDescriptor) {
+            fs.appendFile(fileDescriptor, `${str}\n`, function (err) {
+                if (!err) {
+                    fs.close(fileDescriptor, function (err) {
+                        if (!err) {
+                            callback(false);
+                        } else {
+                            callback(&apos;Error al cerrar el archivo.&apos;);
+                        }
+                    });
+                } else {
+                    callback(&apos;Error al escribir en el archivo.&apos;);
+                }
+            });
+        } else {
+            callback(&apos;No se puede abrir el archivo.&apos;);
+        }
+    });
+};
+
+// Listado de todos los archivos del log
+lib.list = function (includeCompressLogs, callback) {
+    fs.readdir(lib.baseDir, function (err, data) {
+        if (!err &amp;&amp; data &amp;&amp; data.length &gt; 0) {
+            let trimmedFileNames = [];
+            data.forEach(function (fileName) {
+                if (fileName.indexOf(&apos;.log&apos;) &gt; -1) {
+                    trimmedFileNames.push(fileName.replace(&apos;.log&apos;, &apos;&apos;));
+                }
+
+                if (fileName.indexOf(&apos;.gz.b64&apos;) &gt; -1 &amp;&amp; includeCompressLogs) {
+                    trimmedFileNames.push(fileName.replace(&apos;.log&apos;, &apos;&apos;));
+                }
+            });
+            callback(false, trimmedFileNames);
+        } else {
+            callback(err, data);
+        }
+    });
+};
+
+// Comprimir el contenido de archivo
+lib.compress = function (logId, newFile, callback) {
+    let sourceFile = `${logId}.log`;
+    let desFile = `${newFile}.gz.b64`;
+    fs.readFile(`${lib.baseDir}${sourceFile}`, &apos;utf8&apos;, function (err, inputString) {
+        if (!err &amp;&amp; inputString) {
+            zlib.gzip(inputString, function (err, buffer) {
+                if (!err &amp;&amp; buffer) {
+                    // Enviar la informacion al archivo destino
+                    fs.open(`${lib.baseDir}${desFile}`, &apos;wx&apos;, function (err, fileDescriptor) {
+                        if (!err &amp;&amp; fileDescriptor) {
+                            fs.writeFile(fileDescriptor, buffer.toString(&apos;base64&apos;), function (err) {
+                                if (!err) {
+                                    fs.close(fileDescriptor, function (err) {
+                                        if (!err) {
+                                            callback(false);
+                                        } else {
+                                            callback(err);
+                                        }
+                                    });
+                                } else {
+                                    callback(err);
+                                }
+                            });
+                        } else {
+                            callback(err);
+                        }
+                    });
+                } else {
+                    callback(err);
+                }
+            });
+        } else {
+            callback(err);
+        }
+    });
+};
+
+// Descomprimir el contenido del archivo gz.b64 dentro de una cadena
+lib.decompress = function (fileId, callback) {
+    let fileName = `${fileId}.gz.b64`;
+    fs.readFile(`${lib.baseDir}${fileName}`, &apos;utf-8&apos;, function (err, str) {
+        if (!err &amp;&amp; str) {
+            let inputBuffer = Buffer.from(str, &apos;base64&apos;);
+            zlib.unzip(inputBuffer, function (err, outputBuffer) {
+                if (!err &amp;&amp; outputBuffer) {
+                    let str = outputBuffer.toString();
+                    callback(false, str);
+                } else {
+                    callback(err);
+                }
+            });
+        } else {
+            callback(err);
+        }
+    });
+};
+
+// Truncar el archivo log
+lib.truncate = function (logId, callback) {
+    fs.truncate(`${lib.baseDir}${logId}.log`, 0, function (err) {
+        if (!err) {
+            callback(false);
+        } else {
+            callback(err);
+        }
+    });
+};
+
+module.exports = lib;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

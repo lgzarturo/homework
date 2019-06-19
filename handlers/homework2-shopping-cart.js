@@ -3,119 +3,129 @@
  */
 
 // Dependencias de la aplicacion
-var _data = require('./../lib/data');
-var _helpers = require('./../lib/helpers');
+let _data = require('./../lib/data');
+let _helpers = require('./../lib/helpers');
 
 // Controlador dependiendo la solicitud URI
-var handlers = {};
+let handlers = {};
 
-// Manejo de los metodos que seran aceptados en el controlador.
+/**
+ * Manejo de los metodos que seran aceptados en el controlador.
+ * @param data
+ * @param callback
+ */
 handlers.cart = function (data, callback) {
-  var acceptableMethods = ['post', 'get'];
-  if (acceptableMethods.indexOf(data.method) > -1) {
-    handlers._shopping[data.method](data, callback);
-  } else {
-    callback(405);
-  }
+    let acceptableMethods = ['post', 'get'];
+    if (acceptableMethods.indexOf(data.method) > -1) {
+        handlers._shopping[data.method](data, callback);
+    } else {
+        callback(405);
+    }
 };
 
 handlers._shopping = {};
 
-// Shopping cart - ger (URI: /shopping-car)
+/**
+ * Shopping cart - get (URI: /shopping-car)
+ * @param data
+ * @param callback
+ */
 handlers._shopping.get = function (data, callback) {
-  let token = typeof(data.headers.token) == 'string' ? data.headers.token : false;
-  let email = typeof(data.headers.email) == 'string' && data.headers.email.trim().length > 0 ? data.headers.email : false;
+    // Validar los parámetros de la solicitud.
+    let token = typeof (data.headers.token) === 'string' ? data.headers.token : false;
+    let email = typeof (data.headers.email) === 'string' && data.headers.email.trim().length > 0 ? data.headers.email : false;
 
-  _helpers.verifyToken(token, email, function (isValid) {
-    if (isValid) {
-      _data.read('orders', email, function (err, data) {
-        if (err) {
-          callback(404, {'Error': 'No se pudo obtener el carrito de compras.'});
-        } else{
-          var totalItems = 0;
-          var quantityItems = 0;
-          var items = typeof(data) == 'object' && data instanceof Array ? data : [];
-          items.forEach(function (item) {
-            quantityItems += item.quantity;
-            totalItems += item.quantity * item.price;
-          });
-          callback(200, {'Data': data, 'Cantidad': quantityItems, 'Total': totalItems});
+    _helpers.verifyToken(token, email, function (isValid) {
+        if (isValid) {
+            _data.read('orders', email, function (err, data) {
+                if (!err) {
+                    let totalItems = 0;
+                    let quantityItems = 0;
+                    let items = typeof (data) === 'object' && data instanceof Array ? data : [];
+                    items.forEach(function (item) {
+                        quantityItems += item.quantity;
+                        totalItems += item.quantity * item.price;
+                    });
+                    callback(200, {'data': data, 'quantity': quantityItems, 'total': totalItems});
+                } else {
+                    callback(404, {'Error': 'No se pudo obtener el carrito de compras.'});
+                }
+            });
+        } else {
+            callback(401, {'Error': 'El token es requerido o ya no es valido.'});
         }
-      });
-    } else {
-      callback(403, {'Error': 'El token es requerido o ya no es valido.'});
-    }
-  });
+    });
 };
 
-// Shopping cart - post (URI: /shopping-cart)
+/**
+ * Shopping cart - post (URI: /shopping-cart)
+ * @param data
+ * @param callback
+ */
 handlers._shopping.post = function (data, callback) {
-  var token = typeof(data.headers.token) == 'string' ? data.headers.token : false;
-  var email = typeof(data.headers.email) == 'string' && data.headers.email.trim().length > 0 ? data.headers.email : false;
+    // Validar los parámetros de la solicitud.
+    let token = typeof (data.headers.token) === 'string' ? data.headers.token : false;
+    let email = typeof (data.headers.email) === 'string' && data.headers.email.trim().length > 0 ? data.headers.email : false;
+    let code = typeof (data.payload.code) === 'string' && data.payload.code.trim().length > 0 ? data.payload.code.trim() : false;
+    let quantity = typeof (data.payload.quantity) === 'number' && data.payload.quantity > 0 ? data.payload.quantity : false;
 
-  var code = typeof(data.payload.code) == 'string' && data.payload.code.trim().length > 0 ? data.payload.code.trim() : false;
-  var quantity = typeof(data.payload.quantity) == 'number' && data.payload.quantity > 0 ? data.payload.quantity : false;
+    _helpers.verifyToken(token, email, function (isValid) {
+        if (isValid) {
+            if (code && quantity) {
+                _data.read('items', 'menu', function (err, itemData) {
+                    if (!err && itemData) {
+                        let item = itemData[code];
+                        let totalItem = quantity * item.price;
+                        let totalItems = 0;
+                        let quantityItems = 0;
+                        let itemObject = {
+                            'id': code,
+                            'name': item.name,
+                            'description': item.description,
+                            'price': item.price,
+                            'quantity': quantity,
+                            'total': totalItem
+                        };
 
-  _helpers.verifyToken(token, email, function (isValid) {
-    if (isValid) {
+                        // Crear o actualizar la orden
+                        _data.read('orders', email, function (err, data) {
+                            let items = typeof (data) === 'object' && data instanceof Array ? data : [];
+                            items.push(itemObject);
 
-      if (code && quantity) {
-        // Obtener el item
-        _data.read('items', 'menu', function (err, itemData) {
-          if (!err && itemData) {
-            var item = itemData[code];
-            var totalItem = quantity * item.price;
-            var totalItems = 0;
-            var quantityItems = 0;
-            var itemObject = {
-              'id': code,
-              'name': item.name,
-              'description': item.description,
-              'price': item.price,
-              'quantity': quantity,
-              'total': totalItem
-            };
+                            items.forEach(function (item) {
+                                quantityItems += item.quantity;
+                                totalItems += item.quantity * item.price;
+                            });
 
-            // Crear o actualizar la orden
-            _data.read('orders', email, function (err, data) {
-              var items = typeof(data) == 'object' && data instanceof Array ? data : [];
-              items.push(itemObject);
-
-              items.forEach(function (item) {
-                quantityItems += item.quantity;
-                totalItems += item.quantity * item.price;
-              });
-
-              if (err) {
-                _data.create('orders', email, items, function (err) {
-                  if (!err) {
-                    callback(200, {'Cantidad': quantityItems, 'Total': totalItems});
-                  } else {
-                    callback(500, {'Error': 'No se pudo crear el carrito de compras.'});
-                  }
+                            if (err) {
+                                _data.create('orders', email, items, function (err) {
+                                    if (!err) {
+                                        callback(200, {'quantity': quantityItems, 'total': totalItems});
+                                    } else {
+                                        callback(403, {'Error': 'No se pudo crear el carrito de compras.'});
+                                    }
+                                });
+                            } else {
+                                _data.update('orders', email, items, function (err) {
+                                    if (!err) {
+                                        callback(200, {'quantity': quantityItems, 'total': totalItems});
+                                    } else {
+                                        callback(403, {'Error': 'No se pudo agregar el item al carrito de compras.'});
+                                    }
+                                });
+                            }
+                        });
+                    } else {
+                        callback(404, {'Error': 'No se encontro la información del producto'});
+                    }
                 });
-              } else{
-                _data.update('orders', email, items, function (err) {
-                  if (!err) {
-                    callback(200, {'Cantidad': quantityItems, 'Total': totalItems});
-                  } else{
-                    callback(500, {'Error': 'No se pudo agregar el item al carrito de compras.'});
-                  }
-                });
-              }
-            });
-          } else {
-            callback(400);
-          }
-        });
-      } else {
-        callback(400, {'Error': 'No se pudo agregar el artículo a la orden de compra.'});
-      }
-
-    } else {
-      callback(403, {'Error': 'El token es requerido o ya no es valido.'});
-    }
-  });
+            } else {
+                callback(400, {'Error': 'No se pudo agregar el artículo a la orden de compra.'});
+            }
+        } else {
+            callback(401, {'Error': 'El token es requerido o ya no es valido.'});
+        }
+    });
 };
 
 module.exports = handlers;

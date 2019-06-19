@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">homework/lib/helpers.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  </ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">homework/lib/helpers.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * Tareas de ayuda
+ */
+
+// Dependencias
+let crypto = require(&apos;crypto&apos;);
+let https = require(&apos;https&apos;);
+let querystring = require(&apos;querystring&apos;);
+
+// Dependencias de la aplicaci&#xF3;n
+let _config = require(&apos;./../config/config&apos;);
+let _data = require(&apos;./data&apos;);
+
+let lib = {};
+
+/**
+ * Encriptando con el hash SHA256
+ * @param str
+ * @returns {boolean|PromiseLike&lt;ArrayBuffer&gt;}
+ */
+lib.hash = function (str) {
+    if (typeof (str) == &apos;string&apos; &amp;&amp; str.length &gt; 0) {
+        return crypto.createHmac(&apos;sha256&apos;, _config.hashingSecret).update(str).digest(&apos;hex&apos;);
+    }
+    return false;
+};
+
+/**
+ * Convertimos la cadena de JSON en un objeto
+ * @param str
+ * @returns {{}|any}
+ */
+lib.parseJsonToObject = function (str) {
+    try {
+        return JSON.parse(str);
+    } catch (e) {
+        return {};
+    }
+};
+
+/**
+ * Creaci&#xF3;n de cadenas aleatorias
+ * @param strLength
+ * @returns {string|string|boolean}
+ */
+lib.createRandomString = function (strLength) {
+    strLength = typeof (strLength) == &apos;number&apos; &amp;&amp; strLength &gt; 0 ? strLength : false;
+    if (strLength) {
+        let posibleCharacters = &apos;aAbBcCdDeEfFgGhHiIjJkKlLmMnNoOpPqQrRsStTuUvVwWxXyYzZ0123456789&apos;;
+        let str = &apos;&apos;;
+        for (let i = 1; i &lt;= strLength; i++) {
+            let randomCharacter = posibleCharacters.charAt(Math.floor(Math.random() * posibleCharacters.length));
+            str += randomCharacter;
+        }
+        return str;
+    }
+    return false;
+};
+
+/**
+ * Verificaci&#xF3;n del tiempo de vida del token
+ * @param token
+ * @param email
+ * @param callback
+ */
+lib.verifyToken = function (token, email, callback) {
+    _data.read(&apos;tokens&apos;, token, function (err, data) {
+        let isValid = false;
+        if (!err &amp;&amp; data) {
+            console.log(`Data token ${data.email} : ${data.expires}`);
+            isValid = (data.email === email &amp;&amp; data.expires &gt; Date.now());
+        }
+        console.log(`Token ${token} : ${email} is valid: ${isValid}`);
+        callback(isValid);
+    });
+};
+
+/**
+ * Solicitud de pago mediante Stripe.com
+ * @param payload
+ * @param callback
+ */
+lib.stripe = function (payload, callback) {
+    // Objteto para enviar al servicio
+    let reqPayload = {
+        &apos;amount&apos;: Number(payload.amount),
+        &apos;currency&apos;: payload.currency,
+        &apos;description&apos;: payload.description,
+        &apos;source&apos;: payload.source
+    };
+
+    let stringPayload = querystring.stringify(reqPayload);
+    let host = false;
+    let key = false;
+    let protocol = &apos;http:&apos;;
+
+    // Obtener la configuraci&#xF3;n
+    _data.read(&apos;private&apos;, &apos;api-keys&apos;, function (err, keys) {
+        if (!err &amp;&amp; keys) {
+            console.log(keys);
+            console.log(keys.stripe);
+
+            host = keys.stripe.host;
+            protocol = keys.stripe.protocol;
+            key = keys.stripe.secretKey;
+
+            let requestDetails = {
+                protocol: protocol,
+                host: host,
+                method: &apos;POST&apos;,
+                auth: key,
+                path: &apos;/v1/charges&apos;,
+                payload: stringPayload,
+                &apos;headers&apos;: {
+                    &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;,
+                    &apos;Content-Length&apos;: Buffer.byteLength(stringPayload)
+                }
+            };
+
+            let req = https.request(requestDetails, function (res) {
+                let status = res.statusCode;
+                if (status === 200 || status === 201) {
+                    callback(false);
+                } else {
+                    console.log(&apos;No se ha podido generar el pago con Stripe&apos;, status);
+                    callback(403, {&apos;Error&apos;: `API Stripe - Respuesta del servicio: ${status}`});
+                }
+            });
+
+            req.on(&apos;error&apos;, function (err) {
+                callback(&apos;Se ha generado un error: &apos;, err);
+            });
+
+            req.write(stringPayload);
+            req.end();
+
+        } else {
+            callback(401, {&apos;Error&apos;: `Error en los datos privados ${err}`});
+        }
+    });
+};
+
+/**
+ * Envio de correo mediante el API de Mailgun.com
+ * @param to
+ * @param subject
+ * @param text
+ * @param callback
+ */
+lib.mailgun = function (to, subject, text, callback) {
+    let fromEmail = false;
+    let domainName = false;
+    let key = false;
+    let protocol = &apos;http:&apos;;
+    let host = false;
+
+    // Obtener la configuraci&#xF3;n
+    _data.read(&apos;private&apos;, &apos;api-keys&apos;, function (err, keys) {
+        if (!err &amp;&amp; keys) {
+            fromEmail = keys.mailgun.from;
+            key = keys.mailgun.secretKey;
+            domainName = keys.mailgun.domainName;
+            protocol = keys.mailgun.protocol;
+            host = keys.mailgun.host;
+
+            // Objteto para enviar al servicio
+            let reqPayload = {
+                from: fromEmail,
+                to: to,
+                subject: subject,
+                html: text
+            };
+
+            let stringPayload = querystring.stringify(reqPayload);
+
+            // Detalles de la configuraci&#xF3;n de Mailgun
+            let requestDetails = {
+                auth: `api:${key}`,
+                protocol: protocol,
+                host: host,
+                method: &apos;POST&apos;,
+                path: `/v3/${domainName}/messages`,
+                headers: {
+                    &apos;Content-Type&apos;: &apos;application/x-www-form-urlencoded&apos;,
+                    &apos;Content-Length&apos;: Buffer.byteLength(stringPayload)
+                }
+            };
+
+            let req = https.request(requestDetails, function (res) {
+                let status = res.statusCode;
+
+                if (status === 200 || status === 201) {
+                    callback(false);
+                } else {
+                    console.log(&apos;Error en Mailgun&apos;);
+                    callback(`API Mailgun - Respuesta del servicio: ${status}`);
+                }
+            });
+
+            req.on(&apos;error&apos;, function (err) {
+                callback(`Se ha generado un error: ${err}`);
+            });
+
+            req.write(stringPayload);
+            req.end();
+
+        } else {
+            callback(401, {&apos;Error&apos;: `Error en los datos privados ${err}`});
+        }
+    });
+};
+
+module.exports = lib;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

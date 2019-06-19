@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">homework/lib/server.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+</head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  <a href="./manual/index.html" data-ice="manualHeaderLink">Manual</a>
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  </ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">homework/lib/server.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * Servidor
+ */
+
+// Dependencias
+let fs = require(&apos;fs&apos;);
+let http = require(&apos;http&apos;);
+let https = require(&apos;https&apos;);
+let path = require(&apos;path&apos;);
+let url = require(&apos;url&apos;);
+let StringDecoder = require(&apos;string_decoder&apos;).StringDecoder;
+
+// Dependencias de la aplicaci&#xF3;n
+let _config = require(&apos;./../config/config&apos;);
+let _helpers = require(&apos;./helpers&apos;);
+let _homework1 = require(&apos;./../handlers/homework1&apos;);
+let _homework2 = require(&apos;./../handlers/homework2&apos;);
+let _menu = require(&apos;./../handlers/homework2-menu&apos;);
+let _users = require(&apos;./../handlers/homework2-users&apos;);
+let _shopping = require(&apos;./../handlers/homework2-shopping-cart&apos;);
+let _tokens = require(&apos;./../handlers/homework2-tokens&apos;);
+let _orders = require(&apos;./../handlers/homework2-orders&apos;);
+
+let lib = {};
+
+// Iniciando el servidor HTTP
+lib.httpServer = http.createServer(function (req, res) {
+    lib.unifiedServer(req, res);
+});
+
+// Iniciando el servidor HTTPS
+lib.httpsServerOptions = {
+    &apos;key&apos;: fs.readFileSync(path.join(__dirname, &apos;/../.https/key.pem&apos;)),
+    &apos;cert&apos;: fs.readFileSync(path.join(__dirname, &apos;/../.https/cert.pem&apos;))
+};
+
+lib.httpsServer = https.createServer(lib.httpsServerOptions, function (req, res) {
+    lib.unifiedServer(req, res);
+});
+
+// Logica aplicada para los servidores HTTP y HTTPS
+lib.unifiedServer = function (req, res) {
+    let parseUrl = url.parse(req.url, true);
+    let path = parseUrl.pathname;
+    let trimmedPath = path.replace(/^\/+|\/+$/g, &apos;&apos;);
+    let queryStringObject = parseUrl.query;
+    let method = req.method.toLowerCase();
+    let headers = req.headers;
+    let decoder = new StringDecoder(&apos;utf-8&apos;);
+    let buffer = &apos;&apos;;
+
+    req.on(&apos;data&apos;, function (data) {
+        buffer += decoder.write(data);
+    });
+
+    req.on(&apos;end&apos;, function () {
+        buffer += decoder.end();
+
+        let chooseHandler = typeof (lib.router[trimmedPath]) !== &apos;undefined&apos; ? lib.router[trimmedPath] : _homework1.notFound;
+
+        let data = {
+            &apos;trimmedPath&apos;: trimmedPath,
+            &apos;queryStringObject&apos;: queryStringObject,
+            &apos;method&apos;: method,
+            &apos;headers&apos;: headers,
+            &apos;payload&apos;: _helpers.parseJsonToObject(buffer)
+        };
+
+        chooseHandler(data, function (statusCode, payload) {
+
+            statusCode = typeof (statusCode) === &apos;number&apos; ? statusCode : 200;
+            let debugColor = (statusCode === 200) ? &apos;\x1b[32m%s\x1b[0m&apos; : &apos;\x1b[31m%s\x1b[0m&apos;;
+
+            res.setHeader(&apos;Content-Type&apos;, &apos;application/json&apos;);
+            res.writeHead(statusCode);
+            res.end(JSON.stringify(typeof (payload) === &apos;object&apos; ? payload : {}));
+
+            console.log(debugColor, new Date(), trimmedPath, method, statusCode);
+        });
+
+    });
+};
+
+// Define las solicitudes del API
+lib.router = {
+    &apos;hello&apos;: _homework1.hello,
+    &apos;pizza&apos;: _homework2.pizza,
+    &apos;users&apos;: _users.users,
+    &apos;tokens&apos;: _tokens.tokens,
+    &apos;menu&apos;: _menu.items,
+    &apos;shopping-cart&apos;: _shopping.cart,
+    &apos;payments&apos;: _orders.payments,
+};
+
+lib.init = function () {
+    // Iniciamos el servidor HTTP
+    lib.httpServer.listen(_config.httpPort, function () {
+        console.log(&apos;\x1b[36m%s\x1b[0m&apos;, `The server HTTP is listening on port ${_config.httpPort} in [${_config.envName}] mode`);
+    });
+
+    // Iniciamos el servidor HTTPS
+    lib.httpsServer.listen(_config.httpsPort, function () {
+        console.log(&apos;\x1b[35m%s\x1b[0m&apos;, `The server HTTPS is listening on port ${_config.httpsPort} in [${_config.envName}] mode`);
+    });
+
+};
+
+module.exports = lib;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

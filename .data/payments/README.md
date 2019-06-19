@@ -1,3 +1,3 @@
-# payments stuff
+# Payments stuff
 
 Directorio con el listado de pagos

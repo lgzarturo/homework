@@ -1,19 +1,24 @@
 /**
  * Homework 2
+ * Crear una API para la entrega de pizzas
  */
 
 // Dependencias de la aplicación
-var _workers = require('./../lib/workers');
+let _workers = require('./../lib/workers');
 
 // Controlador dependiendo la solicitud URI
-var handlers = {};
-var logFileName = 'homework2';
+let handlers = {};
+let logFileName = 'homework2';
 
-// URI /pizza 
-handlers.pizza = function (data, callback) { 
-  data = {'Success': 'Modulo - Pizza Delivery', 'Data': 'Homework #2'};
-  _workers.log(logFileName, data, 200, '/pizza');
-  callback(200, data);
+/**
+ * URI /pizza
+ * @param data
+ * @param callback
+ */
+handlers.pizza = function (data, callback) {
+    data = {'Success': 'Modulo - Pizza Delivery', 'Data': 'Homework #2'};
+    _workers.log(logFileName, data, 200, '/pizza');
+    callback(200, data);
 };
 
 module.exports = handlers;

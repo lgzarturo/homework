@@ -3,15 +3,14 @@
  */
 
 // Dependencias de la aplicación
-var _server = require('./lib/server');
+let _server = require('./lib/server');
 
-var app = {};
+let app = {};
 
 // Inicializar
 app.init = function () {
-  // Ejecuta el servidor
-  _server.init();
-
+    // Ejecuta el servidor
+    _server.init();
 };
 
 app.init();
