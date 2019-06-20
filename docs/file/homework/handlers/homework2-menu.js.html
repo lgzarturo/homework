@@ -39,8 +39,9 @@
  * Aqu&#xED; se define el m&#xE9;todo get para obtener el menu de la pizzeria.
  */
 
-// Dependencias de la aplicacion
+// Dependencias libs
 let _data = require(&apos;./../lib/data&apos;);
+// @ignore
 let _helpers = require(&apos;./../lib/helpers&apos;);
 
 // Controlador dependiendo la solicitud URI
@@ -56,10 +57,11 @@ handlers.items = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) &gt; -1) {
         handlers._items[data.method](data, callback);
     } else {
-        callback(405);
+        callback(405, {&apos;error&apos;: _helpers.translate(&apos;error.method.not.allowed&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
+// Controlador dependiendo de la solicitud URI
 handlers._items = {};
 
 /**
@@ -84,15 +86,16 @@ handlers._items.get = function (data, callback) {
                         callback(200, data);
                     }
                 } else {
-                    callback(400, {&apos;Error&apos;: &apos;No hay menu disponible&apos;});
+                    callback(400, {&apos;error&apos;: _helpers.translate(&apos;error.data.not.available&apos;, data.headers[&apos;accept-language&apos;])});
                 }
             });
         } else {
-            callback(403, {&apos;Error&apos;: &apos;El token es requerido o ya no es valido.&apos;});
+            callback(403, {&apos;error&apos;: _helpers.translate(&apos;error.token.invalid&apos;, data.headers[&apos;accept-language&apos;])});
         }
     });
 };
 
+// @ignore
 module.exports = handlers;
 </code></pre>
 

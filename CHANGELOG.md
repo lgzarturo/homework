@@ -5,6 +5,12 @@ Tareas de curso de Node JS
 
 ## [Unreleased]
 
+- Se incluye un método para aplicar i18n a las respuestas de las solicitudes.
+- Se mejora el soporte de la documentación mediante Github Pages.
+- Se realizan mejoras en la documentación, mediante anotaciones.
+
+## 18-06-2019
+
 ### Added
 
 - Se agregaron los centavos en las transacciones del Stripe.

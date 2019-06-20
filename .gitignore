@@ -3,6 +3,8 @@ logs
 *.log
 *.gz.b64
 .idea
+.vscode
+.logs/*.json
+.data/*.json
+.data/**/*.json
 
-# Data
-*.json

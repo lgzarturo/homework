@@ -1,4 +1,4 @@
-# private stuff
+# Private stuff
 
 Directorio con el listado de configuraciones para el API de Stripe y Mailgun.
 

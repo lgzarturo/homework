@@ -288,6 +288,60 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "homework/docs/script/inherited-summary.js",
+    "file/homework/docs/script/inherited-summary.js.html",
+    "homework/docs/script/inherited-summary.js",
+    "file"
+  ],
+  [
+    "homework/docs/script/inner-link.js",
+    "file/homework/docs/script/inner-link.js.html",
+    "homework/docs/script/inner-link.js",
+    "file"
+  ],
+  [
+    "homework/docs/script/manual.js",
+    "file/homework/docs/script/manual.js.html",
+    "homework/docs/script/manual.js",
+    "file"
+  ],
+  [
+    "homework/docs/script/patch-for-local.js",
+    "file/homework/docs/script/patch-for-local.js.html",
+    "homework/docs/script/patch-for-local.js",
+    "file"
+  ],
+  [
+    "homework/docs/script/prettify/prettify.js",
+    "file/homework/docs/script/prettify/prettify.js.html",
+    "homework/docs/script/prettify/prettify.js",
+    "file"
+  ],
+  [
+    "homework/docs/script/pretty-print.js",
+    "file/homework/docs/script/pretty-print.js.html",
+    "homework/docs/script/pretty-print.js",
+    "file"
+  ],
+  [
+    "homework/docs/script/search.js",
+    "file/homework/docs/script/search.js.html",
+    "homework/docs/script/search.js",
+    "file"
+  ],
+  [
+    "homework/docs/script/search_index.js",
+    "file/homework/docs/script/search_index.js.html",
+    "homework/docs/script/search_index.js",
+    "file"
+  ],
+  [
+    "homework/docs/script/test-summary.js",
+    "file/homework/docs/script/test-summary.js.html",
+    "homework/docs/script/test-summary.js",
+    "file"
+  ],
+  [
     "homework/handlers/homework1.js",
     "file/homework/handlers/homework1.js.html",
     "homework/handlers/homework1.js",
@@ -333,6 +387,18 @@ window.esdocSearchIndex = [
     "homework/index.js",
     "file/homework/index.js.html",
     "homework/index.js",
+    "file"
+  ],
+  [
+    "homework/langs/en.js",
+    "file/homework/langs/en.js.html",
+    "homework/langs/en.js",
+    "file"
+  ],
+  [
+    "homework/langs/es.js",
+    "file/homework/langs/es.js.html",
+    "homework/langs/es.js",
     "file"
   ],
   [

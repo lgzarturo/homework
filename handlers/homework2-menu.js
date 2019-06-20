@@ -3,8 +3,9 @@
  * Aquí se define el método get para obtener el menu de la pizzeria.
  */
 
-// Dependencias de la aplicacion
+// Dependencias libs
 let _data = require('./../lib/data');
+// @ignore
 let _helpers = require('./../lib/helpers');
 
 // Controlador dependiendo la solicitud URI
@@ -20,10 +21,11 @@ handlers.items = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) > -1) {
         handlers._items[data.method](data, callback);
     } else {
-        callback(405);
+        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.headers['accept-language'])});
     }
 };
 
+// Controlador dependiendo de la solicitud URI
 handlers._items = {};
 
 /**
@@ -48,13 +50,14 @@ handlers._items.get = function (data, callback) {
                         callback(200, data);
                     }
                 } else {
-                    callback(400, {'Error': 'No hay menu disponible'});
+                    callback(400, {'error': _helpers.translate('error.data.not.available', data.headers['accept-language'])});
                 }
             });
         } else {
-            callback(403, {'Error': 'El token es requerido o ya no es valido.'});
+            callback(403, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
         }
     });
 };
 
+// @ignore
 module.exports = handlers;

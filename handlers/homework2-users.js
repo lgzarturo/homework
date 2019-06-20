@@ -2,7 +2,7 @@
  * Homework 2 - Controlador del CRUD User
  */
 
-// Dependencias de la aplicacion
+// Dependencias libs
 let _data = require('./../lib/data');
 let _helpers = require('./../lib/helpers');
 
@@ -20,10 +20,11 @@ handlers.users = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) > -1) {
         handlers._users[data.method](data, callback);
     } else {
-        callback(405);
+        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.headers['accept-language'])});
     }
 };
 
+// @ignore
 handlers._users = {};
 
 /**
@@ -51,20 +52,20 @@ handlers._users.post = function (data, callback) {
                     };
                     _data.create('users', email, objectUser, function (err) {
                         if (!err) {
-                            callback(201, {'Success': `Se ha creado el usuario ${email}`});
+                            callback(201, {'error': _helpers.translate('success.user.created', data.headers['accept-language'])});
                         } else {
-                            callback(409, {'Error': 'No se pudo crear el usuario.'});
+                            callback(409, {'error': _helpers.translate('error.user.created', data.headers['accept-language'])});
                         }
                     });
                 } else {
-                    callback(409, {'Error': 'No se pudo generar el usuario, error con la contraseña.'});
+                    callback(409, {'error': _helpers.translate('error.user.password.encrypt', data.headers['accept-language'])});
                 }
             } else {
-                callback(409, {'Error': 'El usuario ya existe en el sistema.'});
+                callback(409, {'error': _helpers.translate('error.user.exists', data.headers['accept-language'])});
             }
         });
     } else {
-        callback(400, {'Error': 'Faltan parametros requeridos.'});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
     }
 };
 
@@ -85,16 +86,16 @@ handlers._users.get = function (data, callback) {
                         delete data.password;
                         callback(200, data);
                     } else {
-                        callback(404, {'Error': 'No se pudo obtener el usuario indicado'});
+                        callback(404, {'error': _helpers.translate('error.user.not.found', data.headers['accept-language'])});
                     }
                 });
 
             } else {
-                callback(401, {'Error': 'El token es requerido o ya no es valido.'});
+                callback(401, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
             }
         });
     } else {
-        callback(400, {'Error': 'Faltan parametros requeridos.'});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
     }
 };
 
@@ -128,24 +129,24 @@ handlers._users.put = function (data, callback) {
                             }
                             _data.update('users', email, data, function (err) {
                                 if (!err) {
-                                    callback(200, {'Success': `Se actualizo con exito el usuario ${email}`});
+                                    callback(200, {'success': _helpers.translate('success.user.updated', data.headers['accept-language'])});
                                 } else {
-                                    callback(409, {'Error': 'No se pudo actualizar el usuario.'});
+                                    callback(409, {'error': _helpers.translate('error.user.updated', data.headers['accept-language'])});
                                 }
                             });
                         } else {
-                            callback(404, {'Error': 'El usuario especificado no existe.'});
+                            callback(404, {'error': _helpers.translate('error.user.not.found', data.headers['accept-language'])});
                         }
                     });
                 } else {
-                    callback(400, {'Error': 'Faltan parametros requeridos.'});
+                    callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
                 }
             } else {
-                callback(401, {'Error': 'El token es requerido o ya no es valido.'});
+                callback(401, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
             }
         });
     } else {
-        callback(400, {'Error': 'Faltan parametros requeridos.'});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
     }
 };
 
@@ -170,22 +171,23 @@ handlers._users.delete = function (data, callback) {
                                     if (!err) {
                                         callback(204);
                                     } else {
-                                        callback(404, {'Error': 'El usuario ya no existe, este token es invalido'});
+                                        callback(404, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
                                     }
                                 });
                             } else {
-                                callback(400, {'Error': 'No se pudo eliminar el usuario especificado.'});
+                                callback(400, {'error': _helpers.translate('error.user.deleted', data.headers['accept-language'])});
                             }
                         });
                     } else {
-                        callback(404, {'Error': 'El usuario especificado no existe.'});
+                        callback(404, {'error': _helpers.translate('error.user.not.found', data.headers['accept-language'])});
                     }
                 });
             } else {
-                callback(401, {'Error': 'El token es requerido o ya no es valido.'});
+                callback(401, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
             }
         });
     }
 };
 
+// @ignore
 module.exports = handlers;

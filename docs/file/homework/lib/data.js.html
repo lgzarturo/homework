@@ -40,17 +40,25 @@
 
 // Dependencias
 let fs = require(&apos;fs&apos;);
+// @ignore
 let path = require(&apos;path&apos;);
 
-// Dependencias de la aplicaci&#xF3;n
+// Dependencias libs
 let _helpers = require(&apos;./helpers&apos;);
 
+// @ignore
 let lib = {};
 
 // Define el directorio base para los datos
 lib.baseDir = path.join(__dirname, &apos;/../.data/&apos;);
 
-// Escribir datos en el archivo
+/**
+ * Escribir datos en el archivo
+ * @param dir
+ * @param file
+ * @param data
+ * @param callback
+ */
 lib.create = function (dir, file, data, callback) {
     // Abrir el archivo para lectura
     fs.open(`${lib.baseDir}${dir}/${file}.json`, &apos;wx&apos;, function (err, fileDescriptor) {
@@ -77,7 +85,12 @@ lib.create = function (dir, file, data, callback) {
     });
 };
 
-// Leer la informaci&#xF3;n del archivo
+/**
+ * Leer la informaci&#xF3;n del archivo
+ * @param dir
+ * @param file
+ * @param callback
+ */
 lib.read = function (dir, file, callback) {
     fs.readFile(`${lib.baseDir}${dir}/${file}.json`, &apos;utf-8&apos;, function (err, data) {
         if (!err &amp;&amp; data) {
@@ -97,7 +110,13 @@ lib.read = function (dir, file, callback) {
     });
 };
 
-// Actualizar informaci&#xF3;n del archivo
+/**
+ * Actualizar informaci&#xF3;n del archivo
+ * @param dir
+ * @param file
+ * @param data
+ * @param callback
+ */
 lib.update = function (dir, file, data, callback) {
     // Abrir el archivo para escritura
     fs.open(`${lib.baseDir}${dir}/${file}.json`, &apos;r+&apos;, function (err, fileDescriptor) {
@@ -132,7 +151,12 @@ lib.update = function (dir, file, data, callback) {
     });
 };
 
-// Eliminar el archivo
+/**
+ * Eliminar el archivo
+ * @param dir
+ * @param file
+ * @param callback
+ */
 lib.delete = function (dir, file, callback) {
     fs.unlink(`${lib.baseDir}${dir}/${file}.json`, function (err) {
         if (!err) {
@@ -143,7 +167,11 @@ lib.delete = function (dir, file, callback) {
     });
 };
 
-// Listar todos los archivos del directorio
+/**
+ * Listar todos los archivos del directorio
+ * @param dir
+ * @param callback
+ */
 lib.list = function (dir, callback) {
     fs.readdir(`${lib.baseDir}${dir}/`, function (err, data) {
         if (!err &amp;&amp; data &amp;&amp; data.length &gt; 0) {
@@ -158,6 +186,7 @@ lib.list = function (dir, callback) {
     });
 };
 
+// @ignore
 module.exports = lib;
 </code></pre>
 

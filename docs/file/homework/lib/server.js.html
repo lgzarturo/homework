@@ -40,41 +40,67 @@
 
 // Dependencias
 let fs = require(&apos;fs&apos;);
+// @ignore
 let http = require(&apos;http&apos;);
+// @ignore
 let https = require(&apos;https&apos;);
+// @ignore
 let path = require(&apos;path&apos;);
+// @ignore
 let url = require(&apos;url&apos;);
+// @ignore
 let StringDecoder = require(&apos;string_decoder&apos;).StringDecoder;
 
-// Dependencias de la aplicaci&#xF3;n
+// Dependencias libs
 let _config = require(&apos;./../config/config&apos;);
+// @ignore
 let _helpers = require(&apos;./helpers&apos;);
+// @ignore
 let _homework1 = require(&apos;./../handlers/homework1&apos;);
+// @ignore
 let _homework2 = require(&apos;./../handlers/homework2&apos;);
+// @ignore
 let _menu = require(&apos;./../handlers/homework2-menu&apos;);
+// @ignore
 let _users = require(&apos;./../handlers/homework2-users&apos;);
+// @ignore
 let _shopping = require(&apos;./../handlers/homework2-shopping-cart&apos;);
+// @ignore
 let _tokens = require(&apos;./../handlers/homework2-tokens&apos;);
+// @ignore
 let _orders = require(&apos;./../handlers/homework2-orders&apos;);
 
+// @ignore
 let lib = {};
 
-// Iniciando el servidor HTTP
+/**
+ * Opciones para el servidor http
+ */
 lib.httpServer = http.createServer(function (req, res) {
     lib.unifiedServer(req, res);
 });
 
-// Iniciando el servidor HTTPS
+/**
+ * Opciones para el servidor https
+ * @type {{cert: *, key: *}}
+ */
 lib.httpsServerOptions = {
     &apos;key&apos;: fs.readFileSync(path.join(__dirname, &apos;/../.https/key.pem&apos;)),
     &apos;cert&apos;: fs.readFileSync(path.join(__dirname, &apos;/../.https/cert.pem&apos;))
 };
 
+/**
+ * Iniciar el puerto y activar el servidor
+ */
 lib.httpsServer = https.createServer(lib.httpsServerOptions, function (req, res) {
     lib.unifiedServer(req, res);
 });
 
-// Logica aplicada para los servidores HTTP y HTTPS
+/**
+ * Logica aplicada para los servidores HTTP y HTTPS
+ * @param req
+ * @param res
+ */
 lib.unifiedServer = function (req, res) {
     let parseUrl = url.parse(req.url, true);
     let path = parseUrl.pathname;
@@ -117,7 +143,10 @@ lib.unifiedServer = function (req, res) {
     });
 };
 
-// Define las solicitudes del API
+/**
+ * Define las solicitudes del API
+ * @type {{&quot;shopping-cart&quot;: ((function(*=, *=): void)|*), pizza: ((function(*=, *): void)|*), payments: ((function(*=, *=): void)|*), tokens: ((function(*=, *=): void)|*), hello: ((function(*=, *): void)|*), menu: ((function(*=, *=): void)|*), users: ((function(*=, *=): void)|*)}}
+ */
 lib.router = {
     &apos;hello&apos;: _homework1.hello,
     &apos;pizza&apos;: _homework2.pizza,
@@ -128,6 +157,9 @@ lib.router = {
     &apos;payments&apos;: _orders.payments,
 };
 
+/**
+ * Funcion para iniciar los servidores http y https
+ */
 lib.init = function () {
     // Iniciamos el servidor HTTP
     lib.httpServer.listen(_config.httpPort, function () {
@@ -141,6 +173,7 @@ lib.init = function () {
 
 };
 
+// @ignore
 module.exports = lib;
 </code></pre>
 

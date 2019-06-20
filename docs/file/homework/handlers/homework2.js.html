@@ -39,11 +39,14 @@
  * Crear una API para la entrega de pizzas
  */
 
-// Dependencias de la aplicaci&#xF3;n
+// Dependencias libs
 let _workers = require(&apos;./../lib/workers&apos;);
+// @ignore
+let _helpers = require(&apos;./../lib/helpers&apos;);
 
 // Controlador dependiendo la solicitud URI
 let handlers = {};
+// @ignore
 let logFileName = &apos;homework2&apos;;
 
 /**
@@ -52,11 +55,15 @@ let logFileName = &apos;homework2&apos;;
  * @param callback
  */
 handlers.pizza = function (data, callback) {
-    data = {&apos;Success&apos;: &apos;Modulo - Pizza Delivery&apos;, &apos;Data&apos;: &apos;Homework #2&apos;};
+    data = {
+        &apos;success&apos;: _helpers.translate(&apos;success.pizza.response&apos;, data.headers[&apos;accept-language&apos;]),
+        &apos;data&apos;: _helpers.translate(&apos;homework.two&apos;, data.headers[&apos;accept-language&apos;]),
+    };
     _workers.log(logFileName, data, 200, &apos;/pizza&apos;);
     callback(200, data);
 };
 
+// @ignore
 module.exports = handlers;
 </code></pre>
 

@@ -2,10 +2,10 @@
  * Homework 2 - Controlador del CRUD User
  */
 
-// Dependencias
+// Dependencias node
 let querystring = require('querystring');
 
-// Dependencias de la aplicacion
+// Dependencias libs
 let _data = require('./../lib/data');
 let _helpers = require('./../lib/helpers');
 
@@ -22,10 +22,11 @@ handlers.payments = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) > -1) {
         handlers._payments[data.method](data, callback);
     } else {
-        callback(405);
+        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.headers['accept-language'])});
     }
 };
 
+// @ignore
 handlers._payments = {};
 
 /**
@@ -60,10 +61,10 @@ handlers._payments.get = function (data, callback) {
                 `;
 
                 _helpers.mailgun(email, `Reenvio de la Orden #${order}`, message, function (err) {
-                    if (err) {
-                        callback(500, {'Error': 'No se pudo envar el correo de confirmación de pago.'});
+                    if (!err) {
+                        callback(200, {'success': _helpers.translate('success.sent.payment.confirm', data.headers['accept-language'])});
                     } else {
-                        callback(200, {'Success': `Se reenvión el comprobante del orden #${order} al correo ${email}`});
+                        callback(500, {'error': _helpers.translate('error.sent.payment.confirm', data.headers['accept-language'])});
                     }
                 });
             });
@@ -115,14 +116,14 @@ handlers._payments.post = function (data, callback) {
                                 'items': quantityItems,
                                 'amount': totalItems * 100,
                                 'currency': currency,
-                                'description': 'Cargo generado a su tarjeta de crédito.',
+                                'description': _helpers.translate('success.payment.applied', data.headers['accept-language']),
                                 'source': source,
                                 'orderId': orderId
                             };
 
                             _helpers.stripe(payload, function (err) {
                                 if (err) {
-                                    callback(500, {'Error': 'Se ha generado un error al procesar el pago'});
+                                    callback(500, {'error': _helpers.translate('error.process.payment', data.headers['accept-language'])});
                                 } else {
                                     let payloadString = querystring.stringify(payload);
                                     let message = `
@@ -144,7 +145,7 @@ handlers._payments.post = function (data, callback) {
 
                                     _helpers.mailgun(email, payload.description, message, function (err) {
                                         if (err) {
-                                            callback(500, {'Error': 'No se pudo envar el correo de confirmación de pago.'});
+                                            callback(500, {'error': _helpers.translate('error.sent.payment.confirm', data.headers['accept-language'])});
                                         }
                                     });
 
@@ -169,18 +170,19 @@ handlers._payments.post = function (data, callback) {
                                 }
                             });
                         } else {
-                            callback(404, {'Error': 'No se encontró una orden para procesar.'});
+                            callback(404, {'error': _helpers.translate('error.data.not.available', data.headers['accept-language'])});
                         }
                     });
 
                 } else {
-                    callback(404, {'Error': 'No se encontró el usuario para generar el pago.'});
+                    callback(404, {'error': _helpers.translate('error.user.not.found', data.headers['accept-language'])});
                 }
             });
         } else {
-            callback(401, {'Error': 'El token es requerido o ya no es valido.'});
+            callback(401, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
         }
     });
 };
 
+// @ignore
 module.exports = handlers;

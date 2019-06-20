@@ -38,7 +38,7 @@
  * Homework 2 - Controlador del CRUD User
  */
 
-// Dependencias de la aplicacion
+// Dependencias libs
 let _data = require(&apos;./../lib/data&apos;);
 let _helpers = require(&apos;./../lib/helpers&apos;);
 
@@ -56,10 +56,11 @@ handlers.users = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) &gt; -1) {
         handlers._users[data.method](data, callback);
     } else {
-        callback(405);
+        callback(405, {&apos;error&apos;: _helpers.translate(&apos;error.method.not.allowed&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
+// @ignore
 handlers._users = {};
 
 /**
@@ -87,20 +88,20 @@ handlers._users.post = function (data, callback) {
                     };
                     _data.create(&apos;users&apos;, email, objectUser, function (err) {
                         if (!err) {
-                            callback(201, {&apos;Success&apos;: `Se ha creado el usuario ${email}`});
+                            callback(201, {&apos;error&apos;: _helpers.translate(&apos;success.user.created&apos;, data.headers[&apos;accept-language&apos;])});
                         } else {
-                            callback(409, {&apos;Error&apos;: &apos;No se pudo crear el usuario.&apos;});
+                            callback(409, {&apos;error&apos;: _helpers.translate(&apos;error.user.created&apos;, data.headers[&apos;accept-language&apos;])});
                         }
                     });
                 } else {
-                    callback(409, {&apos;Error&apos;: &apos;No se pudo generar el usuario, error con la contrase&#xF1;a.&apos;});
+                    callback(409, {&apos;error&apos;: _helpers.translate(&apos;error.user.password.encrypt&apos;, data.headers[&apos;accept-language&apos;])});
                 }
             } else {
-                callback(409, {&apos;Error&apos;: &apos;El usuario ya existe en el sistema.&apos;});
+                callback(409, {&apos;error&apos;: _helpers.translate(&apos;error.user.exists&apos;, data.headers[&apos;accept-language&apos;])});
             }
         });
     } else {
-        callback(400, {&apos;Error&apos;: &apos;Faltan parametros requeridos.&apos;});
+        callback(400, {&apos;error&apos;: _helpers.translate(&apos;error.params.missing&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
@@ -121,16 +122,16 @@ handlers._users.get = function (data, callback) {
                         delete data.password;
                         callback(200, data);
                     } else {
-                        callback(404, {&apos;Error&apos;: &apos;No se pudo obtener el usuario indicado&apos;});
+                        callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.user.not.found&apos;, data.headers[&apos;accept-language&apos;])});
                     }
                 });
 
             } else {
-                callback(401, {&apos;Error&apos;: &apos;El token es requerido o ya no es valido.&apos;});
+                callback(401, {&apos;error&apos;: _helpers.translate(&apos;error.token.invalid&apos;, data.headers[&apos;accept-language&apos;])});
             }
         });
     } else {
-        callback(400, {&apos;Error&apos;: &apos;Faltan parametros requeridos.&apos;});
+        callback(400, {&apos;error&apos;: _helpers.translate(&apos;error.params.missing&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
@@ -164,24 +165,24 @@ handlers._users.put = function (data, callback) {
                             }
                             _data.update(&apos;users&apos;, email, data, function (err) {
                                 if (!err) {
-                                    callback(200, {&apos;Success&apos;: `Se actualizo con exito el usuario ${email}`});
+                                    callback(200, {&apos;success&apos;: _helpers.translate(&apos;success.user.updated&apos;, data.headers[&apos;accept-language&apos;])});
                                 } else {
-                                    callback(409, {&apos;Error&apos;: &apos;No se pudo actualizar el usuario.&apos;});
+                                    callback(409, {&apos;error&apos;: _helpers.translate(&apos;error.user.updated&apos;, data.headers[&apos;accept-language&apos;])});
                                 }
                             });
                         } else {
-                            callback(404, {&apos;Error&apos;: &apos;El usuario especificado no existe.&apos;});
+                            callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.user.not.found&apos;, data.headers[&apos;accept-language&apos;])});
                         }
                     });
                 } else {
-                    callback(400, {&apos;Error&apos;: &apos;Faltan parametros requeridos.&apos;});
+                    callback(400, {&apos;error&apos;: _helpers.translate(&apos;error.params.missing&apos;, data.headers[&apos;accept-language&apos;])});
                 }
             } else {
-                callback(401, {&apos;Error&apos;: &apos;El token es requerido o ya no es valido.&apos;});
+                callback(401, {&apos;error&apos;: _helpers.translate(&apos;error.token.invalid&apos;, data.headers[&apos;accept-language&apos;])});
             }
         });
     } else {
-        callback(400, {&apos;Error&apos;: &apos;Faltan parametros requeridos.&apos;});
+        callback(400, {&apos;error&apos;: _helpers.translate(&apos;error.params.missing&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
@@ -206,24 +207,25 @@ handlers._users.delete = function (data, callback) {
                                     if (!err) {
                                         callback(204);
                                     } else {
-                                        callback(404, {&apos;Error&apos;: &apos;El usuario ya no existe, este token es invalido&apos;});
+                                        callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.token.invalid&apos;, data.headers[&apos;accept-language&apos;])});
                                     }
                                 });
                             } else {
-                                callback(400, {&apos;Error&apos;: &apos;No se pudo eliminar el usuario especificado.&apos;});
+                                callback(400, {&apos;error&apos;: _helpers.translate(&apos;error.user.deleted&apos;, data.headers[&apos;accept-language&apos;])});
                             }
                         });
                     } else {
-                        callback(404, {&apos;Error&apos;: &apos;El usuario especificado no existe.&apos;});
+                        callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.user.not.found&apos;, data.headers[&apos;accept-language&apos;])});
                     }
                 });
             } else {
-                callback(401, {&apos;Error&apos;: &apos;El token es requerido o ya no es valido.&apos;});
+                callback(401, {&apos;error&apos;: _helpers.translate(&apos;error.token.invalid&apos;, data.headers[&apos;accept-language&apos;])});
             }
         });
     }
 };
 
+// @ignore
 module.exports = handlers;
 </code></pre>
 

@@ -38,10 +38,10 @@
  * Homework 2 - Controlador del CRUD User
  */
 
-// Dependencias
+// Dependencias node
 let querystring = require(&apos;querystring&apos;);
 
-// Dependencias de la aplicacion
+// Dependencias libs
 let _data = require(&apos;./../lib/data&apos;);
 let _helpers = require(&apos;./../lib/helpers&apos;);
 
@@ -58,10 +58,11 @@ handlers.payments = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) &gt; -1) {
         handlers._payments[data.method](data, callback);
     } else {
-        callback(405);
+        callback(405, {&apos;error&apos;: _helpers.translate(&apos;error.method.not.allowed&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
+// @ignore
 handlers._payments = {};
 
 /**
@@ -96,10 +97,10 @@ handlers._payments.get = function (data, callback) {
                 `;
 
                 _helpers.mailgun(email, `Reenvio de la Orden #${order}`, message, function (err) {
-                    if (err) {
-                        callback(500, {&apos;Error&apos;: &apos;No se pudo envar el correo de confirmaci&#xF3;n de pago.&apos;});
+                    if (!err) {
+                        callback(200, {&apos;success&apos;: _helpers.translate(&apos;success.sent.payment.confirm&apos;, data.headers[&apos;accept-language&apos;])});
                     } else {
-                        callback(200, {&apos;Success&apos;: `Se reenvi&#xF3;n el comprobante del orden #${order} al correo ${email}`});
+                        callback(500, {&apos;error&apos;: _helpers.translate(&apos;error.sent.payment.confirm&apos;, data.headers[&apos;accept-language&apos;])});
                     }
                 });
             });
@@ -151,14 +152,14 @@ handlers._payments.post = function (data, callback) {
                                 &apos;items&apos;: quantityItems,
                                 &apos;amount&apos;: totalItems * 100,
                                 &apos;currency&apos;: currency,
-                                &apos;description&apos;: &apos;Cargo generado a su tarjeta de cr&#xE9;dito.&apos;,
+                                &apos;description&apos;: _helpers.translate(&apos;success.payment.applied&apos;, data.headers[&apos;accept-language&apos;]),
                                 &apos;source&apos;: source,
                                 &apos;orderId&apos;: orderId
                             };
 
                             _helpers.stripe(payload, function (err) {
                                 if (err) {
-                                    callback(500, {&apos;Error&apos;: &apos;Se ha generado un error al procesar el pago&apos;});
+                                    callback(500, {&apos;error&apos;: _helpers.translate(&apos;error.process.payment&apos;, data.headers[&apos;accept-language&apos;])});
                                 } else {
                                     let payloadString = querystring.stringify(payload);
                                     let message = `
@@ -180,7 +181,7 @@ handlers._payments.post = function (data, callback) {
 
                                     _helpers.mailgun(email, payload.description, message, function (err) {
                                         if (err) {
-                                            callback(500, {&apos;Error&apos;: &apos;No se pudo envar el correo de confirmaci&#xF3;n de pago.&apos;});
+                                            callback(500, {&apos;error&apos;: _helpers.translate(&apos;error.sent.payment.confirm&apos;, data.headers[&apos;accept-language&apos;])});
                                         }
                                     });
 
@@ -205,20 +206,21 @@ handlers._payments.post = function (data, callback) {
                                 }
                             });
                         } else {
-                            callback(404, {&apos;Error&apos;: &apos;No se encontr&#xF3; una orden para procesar.&apos;});
+                            callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.data.not.available&apos;, data.headers[&apos;accept-language&apos;])});
                         }
                     });
 
                 } else {
-                    callback(404, {&apos;Error&apos;: &apos;No se encontr&#xF3; el usuario para generar el pago.&apos;});
+                    callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.user.not.found&apos;, data.headers[&apos;accept-language&apos;])});
                 }
             });
         } else {
-            callback(401, {&apos;Error&apos;: &apos;El token es requerido o ya no es valido.&apos;});
+            callback(401, {&apos;error&apos;: _helpers.translate(&apos;error.token.invalid&apos;, data.headers[&apos;accept-language&apos;])});
         }
     });
 };
 
+// @ignore
 module.exports = handlers;
 </code></pre>
 

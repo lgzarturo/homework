@@ -38,7 +38,7 @@
  * Homework 2 - Controlador del CRUD User
  */
 
-// Dependencias de la aplicacion
+// Dependencias libs
 let _data = require(&apos;./../lib/data&apos;);
 let _helpers = require(&apos;./../lib/helpers&apos;);
 
@@ -55,10 +55,11 @@ handlers.cart = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) &gt; -1) {
         handlers._shopping[data.method](data, callback);
     } else {
-        callback(405);
+        callback(405, {&apos;error&apos;: _helpers.translate(&apos;error.method.not.allowed&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
+// @ignore
 handlers._shopping = {};
 
 /**
@@ -84,11 +85,11 @@ handlers._shopping.get = function (data, callback) {
                     });
                     callback(200, {&apos;data&apos;: data, &apos;quantity&apos;: quantityItems, &apos;total&apos;: totalItems});
                 } else {
-                    callback(404, {&apos;Error&apos;: &apos;No se pudo obtener el carrito de compras.&apos;});
+                    callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.data.not.available&apos;, data.headers[&apos;accept-language&apos;])});
                 }
             });
         } else {
-            callback(401, {&apos;Error&apos;: &apos;El token es requerido o ya no es valido.&apos;});
+            callback(401, {&apos;error&apos;: _helpers.translate(&apos;error.token.invalid&apos;, data.headers[&apos;accept-language&apos;])});
         }
     });
 };
@@ -138,7 +139,7 @@ handlers._shopping.post = function (data, callback) {
                                     if (!err) {
                                         callback(200, {&apos;quantity&apos;: quantityItems, &apos;total&apos;: totalItems});
                                     } else {
-                                        callback(403, {&apos;Error&apos;: &apos;No se pudo crear el carrito de compras.&apos;});
+                                        callback(403, {&apos;error&apos;: _helpers.translate(&apos;error.shopping.cart.created&apos;, data.headers[&apos;accept-language&apos;])});
                                     }
                                 });
                             } else {
@@ -146,24 +147,25 @@ handlers._shopping.post = function (data, callback) {
                                     if (!err) {
                                         callback(200, {&apos;quantity&apos;: quantityItems, &apos;total&apos;: totalItems});
                                     } else {
-                                        callback(403, {&apos;Error&apos;: &apos;No se pudo agregar el item al carrito de compras.&apos;});
+                                        callback(403, {&apos;error&apos;: _helpers.translate(&apos;error.shopping.cart.add.items&apos;, data.headers[&apos;accept-language&apos;])});
                                     }
                                 });
                             }
                         });
                     } else {
-                        callback(404, {&apos;Error&apos;: &apos;No se encontro la informaci&#xF3;n del producto&apos;});
+                        callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.data.not.available&apos;, data.headers[&apos;accept-language&apos;])});
                     }
                 });
             } else {
-                callback(400, {&apos;Error&apos;: &apos;No se pudo agregar el art&#xED;culo a la orden de compra.&apos;});
+                callback(400, {&apos;error&apos;: &apos;No se pudo agregar el art&#xED;culo a la orden de compra.&apos;});
             }
         } else {
-            callback(401, {&apos;Error&apos;: &apos;El token es requerido o ya no es valido.&apos;});
+            callback(401, {&apos;error&apos;: _helpers.translate(&apos;error.token.invalid&apos;, data.headers[&apos;accept-language&apos;])});
         }
     });
 };
 
+// @ignore
 module.exports = handlers;
 </code></pre>
 

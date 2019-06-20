@@ -1,4 +1,4 @@
-# items stuff
+# Items stuff
 
 Directorio con el listado de artículos.
 

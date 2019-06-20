@@ -35,18 +35,22 @@
 
 <div class="content" data-ice="content"><h1 data-ice="title">homework/lib/helpers.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
- * Tareas de ayuda
+ * Funciones de ayuda
  */
 
 // Dependencias
 let crypto = require(&apos;crypto&apos;);
+// @ignore
 let https = require(&apos;https&apos;);
+// @ignore
 let querystring = require(&apos;querystring&apos;);
 
-// Dependencias de la aplicaci&#xF3;n
+// Dependencias libs
 let _config = require(&apos;./../config/config&apos;);
+// @ignore
 let _data = require(&apos;./data&apos;);
 
+// @ignore
 let lib = {};
 
 /**
@@ -159,7 +163,7 @@ lib.stripe = function (payload, callback) {
                     callback(false);
                 } else {
                     console.log(&apos;No se ha podido generar el pago con Stripe&apos;, status);
-                    callback(403, {&apos;Error&apos;: `API Stripe - Respuesta del servicio: ${status}`});
+                    callback(403, {&apos;error&apos;: `API Stripe - Respuesta del servicio: ${status}`});
                 }
             });
 
@@ -171,7 +175,7 @@ lib.stripe = function (payload, callback) {
             req.end();
 
         } else {
-            callback(401, {&apos;Error&apos;: `Error en los datos privados ${err}`});
+            callback(401, {&apos;error&apos;: `Error en los datos privados ${err}`});
         }
     });
 };
@@ -241,11 +245,30 @@ lib.mailgun = function (to, subject, text, callback) {
             req.end();
 
         } else {
-            callback(401, {&apos;Error&apos;: `Error en los datos privados ${err}`});
+            callback(401, {&apos;error&apos;: `Error en los datos privados ${err}`});
         }
     });
 };
 
+/**
+ * Funcion para obtener las traducciones del array i18n
+ * @param key
+ * @param lang
+ * @returns {*}
+ */
+lib.translate = function (key, lang) {
+    if (lang === undefined) {
+        lang = &quot;es&quot;;
+    }
+    let _lang = require(`./../langs/${lang}`);
+    let translate = _lang[key];
+    if (translate === undefined) {
+        return key;
+    }
+    return translate;
+};
+
+// @ignore
 module.exports = lib;
 </code></pre>
 

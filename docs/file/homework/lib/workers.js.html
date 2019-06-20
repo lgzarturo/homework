@@ -35,18 +35,26 @@
 
 <div class="content" data-ice="content"><h1 data-ice="title">homework/lib/workers.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
- * Worker rekated task
+ * Worker related task
  */
 
-// Dependencias
+// Dependencias node
 let util = require(&apos;util&apos;);
+// @ignore
 let debug = util.debuglog(&apos;lib&apos;);
 
-// Dependencias de la aplicaci&#xF3;n
+// Dependencias libs
 let _logs = require(&apos;./logs&apos;);
-
+// @ignore
 let lib = {};
 
+/**
+ * Generar un registro del log.
+ * @param logFileName
+ * @param message
+ * @param code
+ * @param state
+ */
 lib.log = function (logFileName, message, code, state) {
     if (message &amp;&amp; logFileName) {
         let time = Date.now();
@@ -77,7 +85,9 @@ lib.log = function (logFileName, message, code, state) {
     }
 };
 
-// Rotaci&#xF3;n de los logs
+/**
+ * Rotaci&#xF3;n de los logs
+ */
 lib.rotateLogs = function () {
     // Lista de todos los archivos log que no han sido comprimidos
     _logs.list(false, function (err, logs) {
@@ -107,23 +117,27 @@ lib.rotateLogs = function () {
     });
 };
 
-// Rotaci&#xF3;n de log una vez por d&#xED;a
+/**
+ * Rotaci&#xF3;n de log una vez por d&#xED;a
+ */
 lib.logRotationLoop = function () {
     setInterval(function () {
         lib.rotateLogs();
     }, 1000 * 60 * 60 * 24);
 };
 
-// Inicializar script
+/**
+ * Inicializar script
+ */
 lib.init = function () {
     // Enviar a la consola
     console.log(&apos;\x1b[33m%s\x1b[0m&apos;, &apos;Ejecuci&#xF3;n en segundo plano.&apos;);
-
-    // Comprimir todo los logs
+    // Comprimir los archivos logs
     lib.rotateLogs();
     lib.logRotationLoop();
 };
 
+// @ignore
 module.exports = lib;
 </code></pre>
 

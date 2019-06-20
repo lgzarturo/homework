@@ -2,7 +2,7 @@
  * Homework 2 - Controlador del CRUD Token
  */
 
-// Dependencias de la aplicación
+// Dependencias libs
 let _config = require('./../config/config');
 let _data = require('./../lib/data');
 let _helpers = require('./../lib/helpers');
@@ -20,10 +20,11 @@ handlers.tokens = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) > -1) {
         handlers._tokens[data.method](data, callback);
     } else {
-        callback(405);
+        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.headers['accept-language'])});
     }
 };
 
+// @ignore
 handlers._tokens = {};
 
 /**
@@ -53,18 +54,18 @@ handlers._tokens.post = function (data, callback) {
                         if (!err) {
                             callback(200, object);
                         } else {
-                            callback(401, {'Error': 'No se pudo generar un token valido'});
+                            callback(401, {'error': _helpers.translate('error.token.generated', data.headers['accept-language'])});
                         }
                     });
                 } else {
-                    callback(409, {'Error': 'No se pudo verificar la validez del password.'});
+                    callback(409, {'error': _helpers.translate('error.token.validate.login', data.headers['accept-language'])});
                 }
             } else {
-                callback(404, {'Error': 'No se encontro el usuario seleccionado.'});
+                callback(404, {'error': _helpers.translate('error.user.not.found', data.headers['accept-language'])});
             }
         });
     } else {
-        callback(400, {'Error': 'Faltan parametros para continuar con la solicitud.'});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
     }
 };
 
@@ -82,11 +83,11 @@ handlers._tokens.get = function (data, callback) {
             if (!err && data) {
                 callback(200, data);
             } else {
-                callback(404, {'Error': 'No se pudo encontrar el token del usuario especificado'});
+                callback(404, {'error': _helpers.translate('error.token.not.found', data.headers['accept-language'])});
             }
         });
     } else {
-        callback(400, {'Error': 'No se puede validar la solicitud.'});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
     }
 };
 
@@ -109,18 +110,18 @@ handlers._tokens.put = function (data, callback) {
                         if (!err) {
                             callback(200, data);
                         } else {
-                            callback(409, {'Error': 'No se pudo actualizar el token'});
+                            callback(409, {'error': _helpers.translate('error.token.update', data.headers['accept-language'])});
                         }
                     });
                 } else {
-                    callback(401, {'Error': 'El token ya caduco, no puede ser extendido.'});
+                    callback(401, {'error': _helpers.translate('error.token.expires', data.headers['accept-language'])});
                 }
             } else {
-                callback(401, {'Error': 'El token especificado es invalido.'});
+                callback(401, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
             }
         });
     } else {
-        callback(400, {'Error': 'Faltan parametros, la solicitud es invalida.'});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
     }
 };
 
@@ -140,16 +141,17 @@ handlers._tokens.delete = function (data, callback) {
                     if (!err) {
                         callback(204);
                     } else {
-                        callback(404, {'Error': 'No se pudo encontrar el token especificado.'});
+                        callback(404, {'error': _helpers.translate('error.token.delete', data.headers['accept-language'])});
                     }
                 });
             } else {
-                callback(404, {'Error': 'No se pudo encontrar el token especificado.'});
+                callback(404, {'error': _helpers.translate('error.token.not.found', data.headers['accept-language'])});
             }
         });
     } else {
-        callback(400, {'Error': 'Faltan parametros para continuar con la solicitud.'});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
     }
 };
 
+// @ignore
 module.exports = handlers;

@@ -2,9 +2,10 @@
  * General API
  */
 
-// Dependencias de la aplicación
+// Dependencias libs
 let _server = require('./lib/server');
 
+// Applicación
 let app = {};
 
 // Inicializar
@@ -13,6 +14,8 @@ app.init = function () {
     _server.init();
 };
 
+// Iniciar la aplicación
 app.init();
 
+// @ignore
 module.exports = app;

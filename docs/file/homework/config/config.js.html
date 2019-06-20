@@ -67,10 +67,13 @@ environments.production = {
     &apos;tokenDuration&apos;: 3600000,
 };
 
+// @ignore
 let currentEnvironment = typeof (process.env.NODE_ENV) == &apos;string&apos; ? process.env.NODE_ENV.toLowerCase() : &apos;&apos;;
 
+// @ignore
 let environmentToExport = typeof (environments[currentEnvironment]) == &apos;object&apos; ? environments[currentEnvironment] : environments.staging;
 
+// @ignore
 module.exports = environmentToExport;
 </code></pre>
 

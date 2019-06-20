@@ -38,7 +38,7 @@
  * Homework 2 - Controlador del CRUD Token
  */
 
-// Dependencias de la aplicaci&#xF3;n
+// Dependencias libs
 let _config = require(&apos;./../config/config&apos;);
 let _data = require(&apos;./../lib/data&apos;);
 let _helpers = require(&apos;./../lib/helpers&apos;);
@@ -56,10 +56,11 @@ handlers.tokens = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) &gt; -1) {
         handlers._tokens[data.method](data, callback);
     } else {
-        callback(405);
+        callback(405, {&apos;error&apos;: _helpers.translate(&apos;error.method.not.allowed&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
+// @ignore
 handlers._tokens = {};
 
 /**
@@ -89,18 +90,18 @@ handlers._tokens.post = function (data, callback) {
                         if (!err) {
                             callback(200, object);
                         } else {
-                            callback(401, {&apos;Error&apos;: &apos;No se pudo generar un token valido&apos;});
+                            callback(401, {&apos;error&apos;: _helpers.translate(&apos;error.token.generated&apos;, data.headers[&apos;accept-language&apos;])});
                         }
                     });
                 } else {
-                    callback(409, {&apos;Error&apos;: &apos;No se pudo verificar la validez del password.&apos;});
+                    callback(409, {&apos;error&apos;: _helpers.translate(&apos;error.token.validate.login&apos;, data.headers[&apos;accept-language&apos;])});
                 }
             } else {
-                callback(404, {&apos;Error&apos;: &apos;No se encontro el usuario seleccionado.&apos;});
+                callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.user.not.found&apos;, data.headers[&apos;accept-language&apos;])});
             }
         });
     } else {
-        callback(400, {&apos;Error&apos;: &apos;Faltan parametros para continuar con la solicitud.&apos;});
+        callback(400, {&apos;error&apos;: _helpers.translate(&apos;error.params.missing&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
@@ -118,11 +119,11 @@ handlers._tokens.get = function (data, callback) {
             if (!err &amp;&amp; data) {
                 callback(200, data);
             } else {
-                callback(404, {&apos;Error&apos;: &apos;No se pudo encontrar el token del usuario especificado&apos;});
+                callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.token.not.found&apos;, data.headers[&apos;accept-language&apos;])});
             }
         });
     } else {
-        callback(400, {&apos;Error&apos;: &apos;No se puede validar la solicitud.&apos;});
+        callback(400, {&apos;error&apos;: _helpers.translate(&apos;error.params.missing&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
@@ -145,18 +146,18 @@ handlers._tokens.put = function (data, callback) {
                         if (!err) {
                             callback(200, data);
                         } else {
-                            callback(409, {&apos;Error&apos;: &apos;No se pudo actualizar el token&apos;});
+                            callback(409, {&apos;error&apos;: _helpers.translate(&apos;error.token.update&apos;, data.headers[&apos;accept-language&apos;])});
                         }
                     });
                 } else {
-                    callback(401, {&apos;Error&apos;: &apos;El token ya caduco, no puede ser extendido.&apos;});
+                    callback(401, {&apos;error&apos;: _helpers.translate(&apos;error.token.expires&apos;, data.headers[&apos;accept-language&apos;])});
                 }
             } else {
-                callback(401, {&apos;Error&apos;: &apos;El token especificado es invalido.&apos;});
+                callback(401, {&apos;error&apos;: _helpers.translate(&apos;error.token.invalid&apos;, data.headers[&apos;accept-language&apos;])});
             }
         });
     } else {
-        callback(400, {&apos;Error&apos;: &apos;Faltan parametros, la solicitud es invalida.&apos;});
+        callback(400, {&apos;error&apos;: _helpers.translate(&apos;error.params.missing&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
@@ -176,18 +177,19 @@ handlers._tokens.delete = function (data, callback) {
                     if (!err) {
                         callback(204);
                     } else {
-                        callback(404, {&apos;Error&apos;: &apos;No se pudo encontrar el token especificado.&apos;});
+                        callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.token.delete&apos;, data.headers[&apos;accept-language&apos;])});
                     }
                 });
             } else {
-                callback(404, {&apos;Error&apos;: &apos;No se pudo encontrar el token especificado.&apos;});
+                callback(404, {&apos;error&apos;: _helpers.translate(&apos;error.token.not.found&apos;, data.headers[&apos;accept-language&apos;])});
             }
         });
     } else {
-        callback(400, {&apos;Error&apos;: &apos;Faltan parametros para continuar con la solicitud.&apos;});
+        callback(400, {&apos;error&apos;: _helpers.translate(&apos;error.params.missing&apos;, data.headers[&apos;accept-language&apos;])});
     }
 };
 
+// @ignore
 module.exports = handlers;
 </code></pre>
 
