@@ -5,6 +5,15 @@ Tareas de curso de Node JS
 
 ## [Unreleased]
 
+### Added
+
+- Se inclyen los arreglos en.js y es.js para aplicar las etiquetas de la i18n.
+- Se actualiza la documentación del código.
+
+## 19-06-2019
+
+### Added
+
 - Se incluye un método para aplicar i18n a las respuestas de las solicitudes.
 - Se mejora el soporte de la documentación mediante Github Pages.
 - Se realizan mejoras en la documentación, mediante anotaciones.
