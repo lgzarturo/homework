@@ -19,7 +19,7 @@ handlers.cart = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) > -1) {
         handlers._shopping[data.method](data, callback);
     } else {
-        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.headers['accept-language'])});
+        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.lang)});
     }
 };
 
@@ -49,11 +49,11 @@ handlers._shopping.get = function (data, callback) {
                     });
                     callback(200, {'data': data, 'quantity': quantityItems, 'total': totalItems});
                 } else {
-                    callback(404, {'error': _helpers.translate('error.data.not.available', data.headers['accept-language'])});
+                    callback(404, {'error': _helpers.translate('error.data.not.available', data.lang)});
                 }
             });
         } else {
-            callback(401, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
+            callback(401, {'error': _helpers.translate('error.token.invalid', data.lang)});
         }
     });
 };
@@ -103,7 +103,7 @@ handlers._shopping.post = function (data, callback) {
                                     if (!err) {
                                         callback(200, {'quantity': quantityItems, 'total': totalItems});
                                     } else {
-                                        callback(403, {'error': _helpers.translate('error.shopping.cart.created', data.headers['accept-language'])});
+                                        callback(403, {'error': _helpers.translate('error.shopping.cart.created', data.lang)});
                                     }
                                 });
                             } else {
@@ -111,20 +111,20 @@ handlers._shopping.post = function (data, callback) {
                                     if (!err) {
                                         callback(200, {'quantity': quantityItems, 'total': totalItems});
                                     } else {
-                                        callback(403, {'error': _helpers.translate('error.shopping.cart.add.items', data.headers['accept-language'])});
+                                        callback(403, {'error': _helpers.translate('error.shopping.cart.add.items', data.lang)});
                                     }
                                 });
                             }
                         });
                     } else {
-                        callback(404, {'error': _helpers.translate('error.data.not.available', data.headers['accept-language'])});
+                        callback(404, {'error': _helpers.translate('error.data.not.available', data.lang)});
                     }
                 });
             } else {
                 callback(400, {'error': 'No se pudo agregar el artículo a la orden de compra.'});
             }
         } else {
-            callback(401, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
+            callback(401, {'error': _helpers.translate('error.token.invalid', data.lang)});
         }
     });
 };

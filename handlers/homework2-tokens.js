@@ -20,7 +20,7 @@ handlers.tokens = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) > -1) {
         handlers._tokens[data.method](data, callback);
     } else {
-        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.headers['accept-language'])});
+        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.lang)});
     }
 };
 
@@ -54,18 +54,18 @@ handlers._tokens.post = function (data, callback) {
                         if (!err) {
                             callback(200, object);
                         } else {
-                            callback(401, {'error': _helpers.translate('error.token.generated', data.headers['accept-language'])});
+                            callback(401, {'error': _helpers.translate('error.token.generated', data.lang)});
                         }
                     });
                 } else {
-                    callback(409, {'error': _helpers.translate('error.token.validate.login', data.headers['accept-language'])});
+                    callback(409, {'error': _helpers.translate('error.token.validate.login', data.lang)});
                 }
             } else {
-                callback(404, {'error': _helpers.translate('error.user.not.found', data.headers['accept-language'])});
+                callback(404, {'error': _helpers.translate('error.user.not.found', data.lang)});
             }
         });
     } else {
-        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.lang)});
     }
 };
 
@@ -83,11 +83,11 @@ handlers._tokens.get = function (data, callback) {
             if (!err && data) {
                 callback(200, data);
             } else {
-                callback(404, {'error': _helpers.translate('error.token.not.found', data.headers['accept-language'])});
+                callback(404, {'error': _helpers.translate('error.token.not.found', data.lang)});
             }
         });
     } else {
-        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.lang)});
     }
 };
 
@@ -110,18 +110,18 @@ handlers._tokens.put = function (data, callback) {
                         if (!err) {
                             callback(200, data);
                         } else {
-                            callback(409, {'error': _helpers.translate('error.token.update', data.headers['accept-language'])});
+                            callback(409, {'error': _helpers.translate('error.token.update', data.lang)});
                         }
                     });
                 } else {
-                    callback(401, {'error': _helpers.translate('error.token.expires', data.headers['accept-language'])});
+                    callback(401, {'error': _helpers.translate('error.token.expires', data.lang)});
                 }
             } else {
-                callback(401, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
+                callback(401, {'error': _helpers.translate('error.token.invalid', data.lang)});
             }
         });
     } else {
-        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.lang)});
     }
 };
 
@@ -141,15 +141,15 @@ handlers._tokens.delete = function (data, callback) {
                     if (!err) {
                         callback(204);
                     } else {
-                        callback(404, {'error': _helpers.translate('error.token.delete', data.headers['accept-language'])});
+                        callback(404, {'error': _helpers.translate('error.token.delete', data.lang)});
                     }
                 });
             } else {
-                callback(404, {'error': _helpers.translate('error.token.not.found', data.headers['accept-language'])});
+                callback(404, {'error': _helpers.translate('error.token.not.found', data.lang)});
             }
         });
     } else {
-        callback(400, {'error': _helpers.translate('error.params.missing', data.headers['accept-language'])});
+        callback(400, {'error': _helpers.translate('error.params.missing', data.lang)});
     }
 };
 

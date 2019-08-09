@@ -14,6 +14,15 @@ let handlers = {};
 let logFileName = 'homework1';
 
 /**
+ * URI /ping - Sirve para verificar si el servidor esta vivo.
+ * @param data
+ * @param callback
+ */
+handlers.ping = function (data, callback) {
+    callback(200, {'success': _helpers.translate('success.ping', data.lang)});
+};
+
+/**
  * URI /hello - Solo muestra un mensaje de bienvenida.
  * @param data
  * @param callback - code: 200

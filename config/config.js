@@ -16,6 +16,7 @@ environments.staging = {
     'hashingSecret': '08c1c0dae1dab39f5db54f286b5a75ae',
     'tokenSize': 36,
     'tokenDuration': 3600000,
+    'maxChecks': 5,
 };
 
 /**
@@ -29,6 +30,7 @@ environments.production = {
     'hashingSecret': 'ad97c097cb5e3fe5baeeffcd67b6cedc',
     'tokenSize': 36,
     'tokenDuration': 3600000,
+    'maxChecks': 5,
 };
 
 // @ignore

@@ -22,7 +22,7 @@ handlers.payments = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) > -1) {
         handlers._payments[data.method](data, callback);
     } else {
-        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.headers['accept-language'])});
+        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.lang)});
     }
 };
 
@@ -62,9 +62,9 @@ handlers._payments.get = function (data, callback) {
 
                 _helpers.mailgun(email, `Reenvio de la Orden #${order}`, message, function (err) {
                     if (!err) {
-                        callback(200, {'success': _helpers.translate('success.sent.payment.confirm', data.headers['accept-language'])});
+                        callback(200, {'success': _helpers.translate('success.sent.payment.confirm', data.lang)});
                     } else {
-                        callback(500, {'error': _helpers.translate('error.sent.payment.confirm', data.headers['accept-language'])});
+                        callback(500, {'error': _helpers.translate('error.sent.payment.confirm', data.lang)});
                     }
                 });
             });
@@ -116,14 +116,14 @@ handlers._payments.post = function (data, callback) {
                                 'items': quantityItems,
                                 'amount': totalItems * 100,
                                 'currency': currency,
-                                'description': _helpers.translate('success.payment.applied', data.headers['accept-language']),
+                                'description': _helpers.translate('success.payment.applied', data.lang),
                                 'source': source,
                                 'orderId': orderId
                             };
 
                             _helpers.stripe(payload, function (err) {
                                 if (err) {
-                                    callback(500, {'error': _helpers.translate('error.process.payment', data.headers['accept-language'])});
+                                    callback(500, {'error': _helpers.translate('error.process.payment', data.lang)});
                                 } else {
                                     let payloadString = querystring.stringify(payload);
                                     let message = `
@@ -145,7 +145,7 @@ handlers._payments.post = function (data, callback) {
 
                                     _helpers.mailgun(email, payload.description, message, function (err) {
                                         if (err) {
-                                            callback(500, {'error': _helpers.translate('error.sent.payment.confirm', data.headers['accept-language'])});
+                                            callback(500, {'error': _helpers.translate('error.sent.payment.confirm', data.lang)});
                                         }
                                     });
 
@@ -170,16 +170,16 @@ handlers._payments.post = function (data, callback) {
                                 }
                             });
                         } else {
-                            callback(404, {'error': _helpers.translate('error.data.not.available', data.headers['accept-language'])});
+                            callback(404, {'error': _helpers.translate('error.data.not.available', data.lang)});
                         }
                     });
 
                 } else {
-                    callback(404, {'error': _helpers.translate('error.user.not.found', data.headers['accept-language'])});
+                    callback(404, {'error': _helpers.translate('error.user.not.found', data.lang)});
                 }
             });
         } else {
-            callback(401, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
+            callback(401, {'error': _helpers.translate('error.token.invalid', data.lang)});
         }
     });
 };

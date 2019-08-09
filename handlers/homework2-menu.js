@@ -21,7 +21,7 @@ handlers.items = function (data, callback) {
     if (acceptableMethods.indexOf(data.method) > -1) {
         handlers._items[data.method](data, callback);
     } else {
-        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.headers['accept-language'])});
+        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.lang)});
     }
 };
 
@@ -50,11 +50,11 @@ handlers._items.get = function (data, callback) {
                         callback(200, data);
                     }
                 } else {
-                    callback(400, {'error': _helpers.translate('error.data.not.available', data.headers['accept-language'])});
+                    callback(400, {'error': _helpers.translate('error.data.not.available', data.lang)});
                 }
             });
         } else {
-            callback(403, {'error': _helpers.translate('error.token.invalid', data.headers['accept-language'])});
+            callback(403, {'error': _helpers.translate('error.token.invalid', data.lang)});
         }
     });
 };
