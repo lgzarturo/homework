@@ -7,7 +7,7 @@ Tareas de curso de Node JS
 
 ### Added
 
-- Se inclyen los arreglos en.js y es.js para aplicar las etiquetas de la i18n.
+- Se incluyen los arreglos en.js y es.js para aplicar las etiquetas de la i18n.
 - Se actualiza la documentación del código.
 
 ## 19-06-2019
@@ -26,7 +26,7 @@ Tareas de curso de Node JS
 - Se agrego el reenvió del comprobante de pago, mediante el número de orden.
 - Se modificaron las definiciones de las variables [Airbnb JavaScript Style](https://github.com/airbnb/javascript).
 - Se incluye la documentación de las funciones del código.
-- Se cambiaron las respuestas de los codigos de la API, para que [cumplan con un estandar](https://www.restapitutorial.com/httpstatuscodes.html). 
+- Se cambiaron las respuestas de los códigos de la API, para que [cumplan con un estándar](https://www.restapitutorial.com/httpstatuscodes.html).
 
 ## 17-06-2019
 
@@ -39,10 +39,10 @@ Tareas de curso de Node JS
 - /tokens: Las rutas de esta API se verificaron para que se valide a los usuarios con el objetivo de obtener el token valido para realizar las operaciones en el sistema.
 - /menu: Se obtienen todos los items del menu guardado en el archivo .data/items/menu.json
 - /menu?code=?: Con el parámetro code se obtiene el item deseado.
-- /shopping-cart: Con el método get se obtien el listado de items del carrito de compras y con el método post se agregan elementos al carrito.
-- /payments: se agregan los datos de la tarjeta de credito de pruebas
-- /payments: al procesar el pago de la orden se envia un correo con la confirmación.
-- /payments?order=?: se solicita el reenvio de la orden
+- /shopping-cart: Con el método get se obtiene el listado de items del carrito de compras y con el método post se agregan elementos al carrito.
+- /payments: se agregan los datos de la tarjeta de crédito de pruebas
+- /payments: al procesar el pago de la orden se enviá un correo con la confirmación.
+- /payments?order=?: se solicita el reenvió de la orden
 
 ### Changed
 
@@ -51,7 +51,7 @@ Tareas de curso de Node JS
 ### Added
 
 - Commits on Oct 15, 2018: Se integraron las API de Stripe y Mailgun
-- Commits on Oct 11, 2018: Indentaciones
+- Commits on Oct 11, 2018: Identaciones
 - Commits on Oct 9, 2018: logs, workers, data y handlers
 - Commits on Oct 8, 2018: Se agregó la licencia MIT
 - Commits on Oct 3, 2018: Homework #1
