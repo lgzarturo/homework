@@ -31,6 +31,9 @@ module.exports = {
     'no-process-exit': 'off',
     'node/no-unsupported-features/es-syntax': 'off',
     'object-shorthand': 'off',
-    'class-methods-use-this': 'off'
+    'class-methods-use-this': 'off',
+    'import/no-dynamic-require': 'off',
+    'global-require': 'off',
+    'no-param-reassign': 'warn'
   }
 };
