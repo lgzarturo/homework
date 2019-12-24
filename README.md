@@ -52,14 +52,7 @@ Se valido el funcionamiento del API mediante Postman
 ##### 5. A logged-in user should be able to create an order. You should integrate with the Sandbox of Stripe.com to accept their payment. Note: Use the stripe sandbox for your testing. Follow this link and click on the "tokens" tab to see the fake tokens you can use server-side to confirm the integration is working: [Stripe.com](https://stripe.com/docs/testing#cards)
 
 - /payments: se agregan los datos de la tarjeta de credito de pruebas
-`
-{
-    "creditCart": "4242424242424242",
-    "validMonth": "12",
-    "validYear": "2020",
-    "codeCard": "716"
-}
-`
+  `{ "creditCart": "4242424242424242", "validMonth": "12", "validYear": "2020", "codeCard": "716" }`
 
 ##### 6. When an order is placed, you should email the user a receipt. You should integrate with the sandbox of Mailgun.com for this. Note: Every Mailgun account comes with a sandbox email account domain (whatever@sandbox123.mailgun.org) that you can send from by default. So, there's no need to setup any DNS for your domain for this task [Mailgun.com](https://documentation.mailgun.com/en/latest/faqs.html#how-do-i-pick-a-domain-name-for-my-mailgun-account)
 

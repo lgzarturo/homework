@@ -16,13 +16,15 @@ let handlers = {};
  * @param data
  * @param callback
  */
-handlers.items = function (data, callback) {
-    let acceptableMethods = ['get'];
-    if (acceptableMethods.indexOf(data.method) > -1) {
-        handlers._items[data.method](data, callback);
-    } else {
-        callback(405, {'error': _helpers.translate('error.method.not.allowed', data.lang)});
-    }
+handlers.items = function(data, callback) {
+  let acceptableMethods = ['get'];
+  if (acceptableMethods.indexOf(data.method) > -1) {
+    handlers._items[data.method](data, callback);
+  } else {
+    callback(405, {
+      error: _helpers.translate('error.method.not.allowed', data.lang)
+    });
+  }
 };
 
 // Controlador dependiendo de la solicitud URI
@@ -33,30 +35,43 @@ handlers._items = {};
  * @param data
  * @param callback
  */
-handlers._items.get = function (data, callback) {
-    // Validar los parámetros de la solicitud.
-    let token = typeof (data.headers.token) === 'string' ? data.headers.token : false;
-    let email = typeof (data.headers.email) === 'string' && data.headers.email.trim().length > 0 ? data.headers.email : false;
-    let code = typeof (data.queryStringObject.code) === 'string' && data.queryStringObject.code.trim().length > 0 ? data.queryStringObject.code.trim() : false;
+handlers._items.get = function(data, callback) {
+  // Validar los parámetros de la solicitud.
+  let token =
+    typeof data.headers.token === 'string' ? data.headers.token : false;
+  let email =
+    typeof data.headers.email === 'string' &&
+    data.headers.email.trim().length > 0
+      ? data.headers.email
+      : false;
+  let code =
+    typeof data.queryStringObject.code === 'string' &&
+    data.queryStringObject.code.trim().length > 0
+      ? data.queryStringObject.code.trim()
+      : false;
 
-    _helpers.verifyToken(token, email, function (isValid) {
-        // Verificar si el token es válido
-        if (isValid) {
-            _data.read('items', 'menu', function (err, data) {
-                if (!err && data) {
-                    if (code) {
-                        callback(200, data[code]);
-                    } else {
-                        callback(200, data);
-                    }
-                } else {
-                    callback(400, {'error': _helpers.translate('error.data.not.available', data.lang)});
-                }
-            });
+  _helpers.verifyToken(token, email, function(isValid) {
+    // Verificar si el token es válido
+    if (isValid) {
+      _data.read('items', 'menu', function(err, data) {
+        if (!err && data) {
+          if (code) {
+            callback(200, data[code]);
+          } else {
+            callback(200, data);
+          }
         } else {
-            callback(403, {'error': _helpers.translate('error.token.invalid', data.lang)});
+          callback(400, {
+            error: _helpers.translate('error.data.not.available', data.lang)
+          });
         }
-    });
+      });
+    } else {
+      callback(403, {
+        error: _helpers.translate('error.token.invalid', data.lang)
+      });
+    }
+  });
 };
 
 // @ignore

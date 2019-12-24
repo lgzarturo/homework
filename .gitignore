@@ -7,4 +7,3 @@ logs
 .logs/*.json
 .data/*.json
 .data/**/*.json
-

@@ -18,13 +18,16 @@ let logFileName = 'homework2';
  * @param data
  * @param callback
  */
-handlers.pizza = function (data, callback) {
-    data = {
-        'success': _helpers.translate('success.pizza.response', data.headers['accept-language']),
-        'data': _helpers.translate('homework.two', data.headers['accept-language']),
-    };
-    _workers.log(logFileName, data, 200, '/pizza');
-    callback(200, data);
+handlers.pizza = function(data, callback) {
+  data = {
+    success: _helpers.translate(
+      'success.pizza.response',
+      data.headers['accept-language']
+    ),
+    data: _helpers.translate('homework.two', data.headers['accept-language'])
+  };
+  _workers.log(logFileName, data, 200, '/pizza');
+  callback(200, data);
 };
 
 // @ignore
