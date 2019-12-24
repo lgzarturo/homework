@@ -4,14 +4,13 @@
  */
 
 // Dependencias libs
-let _workers = require('./../lib/workers');
+const workers = require('./../lib/workers');
 // @ignore
-let _helpers = require('./../lib/helpers');
-
+const helpers = require('./../lib/helpers');
 // Controlador dependiendo la solicitud URI
-let handlers = {};
+const handlers = {};
 // @ignore
-let logFileName = 'homework2';
+const logFileName = 'homework2';
 
 /**
  * URI /pizza
@@ -19,15 +18,12 @@ let logFileName = 'homework2';
  * @param callback
  */
 handlers.pizza = function(data, callback) {
-  data = {
-    success: _helpers.translate(
-      'success.pizza.response',
-      data.headers['accept-language']
-    ),
-    data: _helpers.translate('homework.two', data.headers['accept-language'])
+  const requestData = {
+    success: helpers.translate('success.pizza.response', data.headers['accept-language']),
+    data: helpers.translate('homework.two', data.headers['accept-language'])
   };
-  _workers.log(logFileName, data, 200, '/pizza');
-  callback(200, data);
+  workers.log(logFileName, requestData, 200, '/pizza');
+  callback(200, requestData);
 };
 
 // @ignore

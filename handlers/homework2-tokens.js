@@ -3,199 +3,154 @@
  */
 
 // Dependencias libs
-let _config = require('./../config/config');
-let _data = require('./../lib/data');
-let _helpers = require('./../lib/helpers');
-
+const confg = require('./../config/config').default;
+const data = require('./../lib/data');
+const helpers = require('./../lib/helpers');
 // Controlador dependiendo la solicitud URI
-let handlers = {};
+const handlers = {};
 
 /**
  * Manejo de los metodos que seran aceptados en el controlador.
- * @param data
+ * @param req
  * @param callback
  */
-handlers.tokens = function(data, callback) {
-  let acceptableMethods = ['post', 'get', 'put', 'delete'];
-  if (acceptableMethods.indexOf(data.method) > -1) {
-    handlers._tokens[data.method](data, callback);
+handlers.tokens = function(req, callback) {
+  const acceptableMethods = ['post', 'get', 'put', 'delete'];
+  if (acceptableMethods.indexOf(req.method) > -1) {
+    handlers.tokens[req.method](req, callback);
   } else {
-    callback(405, {
-      error: _helpers.translate('error.method.not.allowed', data.lang)
-    });
+    callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) });
   }
 };
 
 // @ignore
-handlers._tokens = {};
+handlers.tokens = {};
 
 /**
  * Tokens - post (URI: /tokens)
- * @param data
+ * @param req
  * @param callback
  */
-handlers._tokens.post = function(data, callback) {
+handlers.tokens.post = function(req, callback) {
   // Validar los parámetros de la solicitud.
-  let email =
-    typeof data.payload.email == 'string' ? data.payload.email.trim() : false;
-  let password =
-    typeof data.payload.password == 'string' &&
-    data.payload.password.trim().length > 0
-      ? data.payload.password.trim()
-      : false;
+  const email = typeof req.payload.email === 'string' ? req.payload.email.trim() : false;
+  const password = typeof req.payload.password === 'string' && req.payload.password.trim().length > 0 ? req.payload.password.trim() : false;
 
   if (email && password) {
-    _data.read('users', email, function(err, user) {
-      if (!err && user) {
-        let hashedPassword = _helpers.hash(password);
+    data.read('users', email, function(errRead, user) {
+      if (!errRead && user) {
+        const hashedPassword = helpers.hash(password);
         if (hashedPassword === user.password) {
-          let token = _helpers.createRandomString(_config.tokenSize);
-          let expires = Date.now() + _config.tokenDuration;
-          let object = {
+          const token = helpers.createRandomString(confg.tokenSize);
+          const expires = Date.now() + confg.tokenDuration;
+          const object = {
             email: email,
             token: token,
             expires: expires
           };
 
-          _data.create('tokens', token, object, function(err) {
-            if (!err) {
+          data.create('tokens', token, object, function(errCreate) {
+            if (!errCreate) {
               callback(200, object);
             } else {
-              callback(401, {
-                error: _helpers.translate('error.token.generated', data.lang)
-              });
+              callback(401, { error: helpers.translate('error.token.generated', req.lang) });
             }
           });
         } else {
-          callback(409, {
-            error: _helpers.translate('error.token.validate.login', data.lang)
-          });
+          callback(409, { error: helpers.translate('error.token.validate.login', req.lang) });
         }
       } else {
-        callback(404, {
-          error: _helpers.translate('error.user.not.found', data.lang)
-        });
+        callback(404, { error: helpers.translate('error.user.not.found', req.lang) });
       }
     });
   } else {
-    callback(400, {
-      error: _helpers.translate('error.params.missing', data.lang)
-    });
+    callback(400, { error: helpers.translate('error.params.missing', req.lang) });
   }
 };
 
 /**
  * Tokens - get (URI: /tokens?token={?})
- * @param data
+ * @param req
  * @param callback
  */
-handlers._tokens.get = function(data, callback) {
+handlers.tokens.get = function(req, callback) {
   // Validar los parámetros de la solicitud.
-  let token =
-    typeof data.queryStringObject.token === 'string' &&
-    data.queryStringObject.token.trim().length === _config.tokenSize
-      ? data.queryStringObject.token.trim()
-      : false;
+  const token = typeof req.queryStringObject.token === 'string' && req.queryStringObject.token.trim().length === confg.tokenSize ? req.queryStringObject.token.trim() : false;
 
   if (token) {
-    _data.read('tokens', token, function(err, data) {
-      if (!err && data) {
-        callback(200, data);
+    data.read('tokens', token, function(err, dataToken) {
+      if (!err && dataToken) {
+        callback(200, dataToken);
       } else {
-        callback(404, {
-          error: _helpers.translate('error.token.not.found', data.lang)
-        });
+        callback(404, { error: helpers.translate('error.token.not.found', req.lang) });
       }
     });
   } else {
     callback(400, {
-      error: _helpers.translate('error.params.missing', data.lang)
+      error: helpers.translate('error.params.missing', req.lang)
     });
   }
 };
 
 /**
  * Tokens - put (URI: /tokens)
- * @param data
+ * @param req
  * @param callback
  */
-handlers._tokens.put = function(data, callback) {
+handlers.tokens.put = function(req, callback) {
   // Validar los parámetros de la solicitud.
-  let token =
-    typeof data.payload.token === 'string' &&
-    data.payload.token.trim().length === _config.tokenSize
-      ? data.payload.token.trim()
-      : false;
-  let extended =
-    typeof data.payload.extend === 'boolean' ? data.payload.extend : false;
+  const token = typeof req.payload.token === 'string' && req.payload.token.trim().length === confg.tokenSize ? req.payload.token.trim() : false;
+  const extended = typeof req.payload.extend === 'boolean' ? req.payload.extend : false;
 
   if (token && extended) {
-    _data.read('tokens', token, function(err, data) {
-      if (!err && data) {
-        if (data.expires > Date.now()) {
-          data.expires = Date.now() + _config.tokenDuration;
-          _data.update('tokens', token, data, function(err) {
-            if (!err) {
-              callback(200, data);
+    data.read('tokens', token, function(err, dataToken) {
+      if (!err && dataToken) {
+        if (dataToken.expires > Date.now()) {
+          dataToken.expires = Date.now() + confg.tokenDuration;
+          data.update('tokens', token, dataToken, function(errUpdate) {
+            if (!errUpdate) {
+              callback(200, dataToken);
             } else {
-              callback(409, {
-                error: _helpers.translate('error.token.update', data.lang)
-              });
+              callback(409, { error: helpers.translate('error.token.update', req.lang) });
             }
           });
         } else {
-          callback(401, {
-            error: _helpers.translate('error.token.expires', data.lang)
-          });
+          callback(401, { error: helpers.translate('error.token.expires', req.lang) });
         }
       } else {
-        callback(401, {
-          error: _helpers.translate('error.token.invalid', data.lang)
-        });
+        callback(401, { error: helpers.translate('error.token.invalid', req.lang) });
       }
     });
   } else {
-    callback(400, {
-      error: _helpers.translate('error.params.missing', data.lang)
-    });
+    callback(400, { error: helpers.translate('error.params.missing', req.lang) });
   }
 };
 
 /**
  * Tokens - delete (URI: /tokens?token={?})
- * @param data
+ * @param req
  * @param callback
  */
-handlers._tokens.delete = function(data, callback) {
+handlers.tokens.delete = function(req, callback) {
   // Validar los parámetros de la solicitud.
-  let token =
-    typeof data.queryStringObject.token === 'string' &&
-    data.queryStringObject.token.trim().length === _config.tokenSize
-      ? data.queryStringObject.token.trim()
-      : false;
+  const token = typeof req.queryStringObject.token === 'string' && req.queryStringObject.token.trim().length === confg.tokenSize ? req.queryStringObject.token.trim() : false;
 
   if (token) {
-    _data.read('tokens', token, function(err, data) {
-      if (!err && data) {
-        _data.delete('tokens', token, function(err) {
-          if (!err) {
+    data.read('tokens', token, function(errRead, dataToken) {
+      if (!errRead && dataToken) {
+        data.delete('tokens', token, function(errDelete) {
+          if (!errDelete) {
             callback(204);
           } else {
-            callback(404, {
-              error: _helpers.translate('error.token.delete', data.lang)
-            });
+            callback(404, { error: helpers.translate('error.token.delete', req.lang) });
           }
         });
       } else {
-        callback(404, {
-          error: _helpers.translate('error.token.not.found', data.lang)
-        });
+        callback(404, { error: helpers.translate('error.token.not.found', req.lang) });
       }
     });
   } else {
-    callback(400, {
-      error: _helpers.translate('error.params.missing', data.lang)
-    });
+    callback(400, { error: helpers.translate('error.params.missing', req.lang) });
   }
 };
 
