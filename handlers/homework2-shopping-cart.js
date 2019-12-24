@@ -3,110 +3,84 @@
  */
 
 // Dependencias libs
-let _data = require('./../lib/data');
-let _helpers = require('./../lib/helpers');
-
+const data = require('./../lib/data');
+const helpers = require('./../lib/helpers');
 // Controlador dependiendo la solicitud URI
-let handlers = {};
+const handlers = {};
 
 /**
  * Manejo de los metodos que seran aceptados en el controlador.
- * @param data
+ * @param req
  * @param callback
  */
-handlers.cart = function(data, callback) {
-  let acceptableMethods = ['post', 'get'];
-  if (acceptableMethods.indexOf(data.method) > -1) {
-    handlers._shopping[data.method](data, callback);
+handlers.cart = function(req, callback) {
+  const acceptableMethods = ['post', 'get'];
+  if (acceptableMethods.indexOf(req.method) > -1) {
+    handlers.shopping[req.method](req, callback);
   } else {
     callback(405, {
-      error: _helpers.translate('error.method.not.allowed', data.lang)
+      error: helpers.translate('error.method.not.allowed', req.lang)
     });
   }
 };
 
 // @ignore
-handlers._shopping = {};
+handlers.shopping = {};
 
 /**
  * Shopping cart - get (URI: /shopping-car)
- * @param data
+ * @param req
  * @param callback
  */
-handlers._shopping.get = function(data, callback) {
+handlers.shopping.get = function(req, callback) {
   // Validar los parámetros de la solicitud.
-  let token =
-    typeof data.headers.token === 'string' ? data.headers.token : false;
-  let email =
-    typeof data.headers.email === 'string' &&
-    data.headers.email.trim().length > 0
-      ? data.headers.email
-      : false;
+  const token = typeof req.headers.token === 'string' ? req.headers.token : false;
+  const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false;
 
-  _helpers.verifyToken(token, email, function(isValid) {
+  helpers.verifyToken(token, email, function(isValid) {
     if (isValid) {
-      _data.read('orders', email, function(err, data) {
-        if (!err) {
+      data.read('orders', email, function(errRead, dataOrder) {
+        if (!errRead) {
           let totalItems = 0;
           let quantityItems = 0;
-          let items =
-            typeof data === 'object' && data instanceof Array ? data : [];
+          const items = typeof dataOrder === 'object' && dataOrder instanceof Array ? dataOrder : [];
           items.forEach(function(item) {
             quantityItems += item.quantity;
             totalItems += item.quantity * item.price;
           });
-          callback(200, {
-            data: data,
-            quantity: quantityItems,
-            total: totalItems
-          });
+          callback(200, { data: dataOrder, quantity: quantityItems, total: totalItems });
         } else {
-          callback(404, {
-            error: _helpers.translate('error.data.not.available', data.lang)
-          });
+          callback(404, { error: helpers.translate('error.data.not.available', req.lang) });
         }
       });
     } else {
-      callback(401, {
-        error: _helpers.translate('error.token.invalid', data.lang)
-      });
+      callback(401, { error: helpers.translate('error.token.invalid', req.lang) });
     }
   });
 };
 
 /**
  * Shopping cart - post (URI: /shopping-cart)
- * @param data
+ * @param req
  * @param callback
  */
-handlers._shopping.post = function(data, callback) {
+handlers.shopping.post = function(req, callback) {
   // Validar los parámetros de la solicitud.
-  let token =
-    typeof data.headers.token === 'string' ? data.headers.token : false;
-  let email =
-    typeof data.headers.email === 'string' &&
-    data.headers.email.trim().length > 0
-      ? data.headers.email
-      : false;
-  let code =
-    typeof data.payload.code === 'string' && data.payload.code.trim().length > 0
-      ? data.payload.code.trim()
-      : false;
-  let quantity =
-    typeof data.payload.quantity === 'number' && data.payload.quantity > 0
-      ? data.payload.quantity
-      : false;
+  const token = typeof req.headers.token === 'string' ? req.headers.token : false;
+  const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false;
+  const code = typeof req.payload.code === 'string' && req.payload.code.trim().length > 0 ? req.payload.code.trim() : false;
+  const quantity = typeof req.payload.quantity === 'number' && req.payload.quantity > 0 ? req.payload.quantity : false;
 
-  _helpers.verifyToken(token, email, function(isValid) {
+  helpers.verifyToken(token, email, function(isValid) {
     if (isValid) {
       if (code && quantity) {
-        _data.read('items', 'menu', function(err, itemData) {
-          if (!err && itemData) {
-            let item = itemData[code];
-            let totalItem = quantity * item.price;
+        data.read('items', 'menu', function(errRead, itemData) {
+          if (!errRead && itemData) {
+            const item = itemData[code];
+            const totalItem = quantity * item.price;
             let totalItems = 0;
             let quantityItems = 0;
-            let itemObject = {
+            const itemObject = {
               id: code,
               name: item.name,
               description: item.description,
@@ -116,65 +90,42 @@ handlers._shopping.post = function(data, callback) {
             };
 
             // Crear o actualizar la orden
-            _data.read('orders', email, function(err, data) {
-              let items =
-                typeof data === 'object' && data instanceof Array ? data : [];
+            data.read('orders', email, function(errReadOrder, dataOrder) {
+              const items = typeof dataOrder === 'object' && dataOrder instanceof Array ? dataOrder : [];
               items.push(itemObject);
 
-              items.forEach(function(item) {
-                quantityItems += item.quantity;
-                totalItems += item.quantity * item.price;
+              items.forEach(function(el) {
+                quantityItems += el.quantity;
+                totalItems += el.quantity * el.price;
               });
 
-              if (err) {
-                _data.create('orders', email, items, function(err) {
-                  if (!err) {
-                    callback(200, {
-                      quantity: quantityItems,
-                      total: totalItems
-                    });
+              if (errReadOrder) {
+                data.create('orders', email, items, function(errCreate) {
+                  if (!errCreate) {
+                    callback(200, { quantity: quantityItems, total: totalItems });
                   } else {
-                    callback(403, {
-                      error: _helpers.translate(
-                        'error.shopping.cart.created',
-                        data.lang
-                      )
-                    });
+                    callback(403, { error: helpers.translate('error.shopping.cart.created', req.lang) });
                   }
                 });
               } else {
-                _data.update('orders', email, items, function(err) {
-                  if (!err) {
-                    callback(200, {
-                      quantity: quantityItems,
-                      total: totalItems
-                    });
+                data.update('orders', email, items, function(errUpdate) {
+                  if (!errUpdate) {
+                    callback(200, { quantity: quantityItems, total: totalItems });
                   } else {
-                    callback(403, {
-                      error: _helpers.translate(
-                        'error.shopping.cart.add.items',
-                        data.lang
-                      )
-                    });
+                    callback(403, { error: helpers.translate('error.shopping.cart.add.items', req.lang) });
                   }
                 });
               }
             });
           } else {
-            callback(404, {
-              error: _helpers.translate('error.data.not.available', data.lang)
-            });
+            callback(404, { error: helpers.translate('error.data.not.available', req.lang) });
           }
         });
       } else {
-        callback(400, {
-          error: 'No se pudo agregar el artículo a la orden de compra.'
-        });
+        callback(400, { error: 'No se pudo agregar el artículo a la orden de compra.' });
       }
     } else {
-      callback(401, {
-        error: _helpers.translate('error.token.invalid', data.lang)
-      });
+      callback(401, { error: helpers.translate('error.token.invalid', req.lang) });
     }
   });
 };
