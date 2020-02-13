@@ -3,8 +3,10 @@
  */
 
 // Dependencias libs
-const confg = require('./../config/config').default;
+const config = require('./../config/config').default;
+
 const data = require('./../lib/data');
+
 const helpers = require('./../lib/helpers');
 // Controlador dependiendo la solicitud URI
 const handlers = {};
@@ -23,7 +25,6 @@ handlers.tokens = function(req, callback) {
   }
 };
 
-// @ignore
 handlers.tokens = {};
 
 /**
@@ -41,8 +42,8 @@ handlers.tokens.post = function(req, callback) {
       if (!errRead && user) {
         const hashedPassword = helpers.hash(password);
         if (hashedPassword === user.password) {
-          const token = helpers.createRandomString(confg.tokenSize);
-          const expires = Date.now() + confg.tokenDuration;
+          const token = helpers.createRandomString(config.tokenSize);
+          const expires = Date.now() + config.tokenDuration;
           const object = {
             email: email,
             token: token,
@@ -75,7 +76,7 @@ handlers.tokens.post = function(req, callback) {
  */
 handlers.tokens.get = function(req, callback) {
   // Validar los parámetros de la solicitud.
-  const token = typeof req.queryStringObject.token === 'string' && req.queryStringObject.token.trim().length === confg.tokenSize ? req.queryStringObject.token.trim() : false;
+  const token = typeof req.queryStringObject.token === 'string' && req.queryStringObject.token.trim().length === config.tokenSize ? req.queryStringObject.token.trim() : false;
 
   if (token) {
     data.read('tokens', token, function(err, dataToken) {
@@ -99,14 +100,14 @@ handlers.tokens.get = function(req, callback) {
  */
 handlers.tokens.put = function(req, callback) {
   // Validar los parámetros de la solicitud.
-  const token = typeof req.payload.token === 'string' && req.payload.token.trim().length === confg.tokenSize ? req.payload.token.trim() : false;
+  const token = typeof req.payload.token === 'string' && req.payload.token.trim().length === config.tokenSize ? req.payload.token.trim() : false;
   const extended = typeof req.payload.extend === 'boolean' ? req.payload.extend : false;
 
   if (token && extended) {
     data.read('tokens', token, function(err, dataToken) {
       if (!err && dataToken) {
         if (dataToken.expires > Date.now()) {
-          dataToken.expires = Date.now() + confg.tokenDuration;
+          dataToken.expires = Date.now() + config.tokenDuration;
           data.update('tokens', token, dataToken, function(errUpdate) {
             if (!errUpdate) {
               callback(200, dataToken);
@@ -133,7 +134,7 @@ handlers.tokens.put = function(req, callback) {
  */
 handlers.tokens.delete = function(req, callback) {
   // Validar los parámetros de la solicitud.
-  const token = typeof req.queryStringObject.token === 'string' && req.queryStringObject.token.trim().length === confg.tokenSize ? req.queryStringObject.token.trim() : false;
+  const token = typeof req.queryStringObject.token === 'string' && req.queryStringObject.token.trim().length === config.tokenSize ? req.queryStringObject.token.trim() : false;
 
   if (token) {
     data.read('tokens', token, function(errRead, dataToken) {
@@ -154,5 +155,4 @@ handlers.tokens.delete = function(req, callback) {
   }
 };
 
-// @ignore
 module.exports = handlers;

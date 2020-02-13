@@ -4,7 +4,9 @@
 
 // Dependencias libs
 const config = require('./../config/config').default;
+
 const data = require('./../lib/data');
+
 const helpers = require('./../lib/helpers');
 // Controlador dependiendo la solicitud URI
 const handlers = {};
@@ -23,7 +25,6 @@ handlers.checks = function(req, callback) {
   }
 };
 
-// @ignore
 handlers.checks = {};
 
 /**
@@ -239,5 +240,4 @@ handlers.checks.delete = function(req, callback) {
   }
 };
 
-// @ignore
 module.exports = handlers;

@@ -4,6 +4,7 @@
 
 // Dependencias libs
 const data = require('./../lib/data');
+
 const helpers = require('./../lib/helpers');
 // Controlador dependiendo la solicitud URI
 const handlers = {};
@@ -24,7 +25,6 @@ handlers.cart = function(req, callback) {
   }
 };
 
-// @ignore
 handlers.shopping = {};
 
 /**
@@ -130,5 +130,4 @@ handlers.shopping.post = function(req, callback) {
   });
 };
 
-// @ignore
 module.exports = handlers;

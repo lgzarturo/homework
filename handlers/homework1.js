@@ -5,11 +5,11 @@
 
 // Dependencias libs
 const workers = require('./../lib/workers');
-// @ignore
+
 const helpers = require('./../lib/helpers');
 // Controlador dependiendo la solicitud URI
 const handlers = {};
-// @ignore
+
 const logFileName = 'homework1';
 
 /**
@@ -48,5 +48,4 @@ handlers.notFound = function(req, callback) {
   callback(404, data);
 };
 
-// @ignore
 module.exports = handlers;

@@ -6,6 +6,7 @@
 const querystring = require('querystring');
 // Dependencias libs
 const data = require('./../lib/data');
+
 const helpers = require('./../lib/helpers');
 // Controlador dependiendo la solicitud URI
 const handlers = {};
@@ -24,7 +25,6 @@ handlers.payments = function(req, callback) {
   }
 };
 
-// @ignore
 handlers.payments = {};
 
 /**
@@ -183,5 +183,4 @@ handlers.payments.post = function(req, callback) {
   });
 };
 
-// @ignore
 module.exports = handlers;
