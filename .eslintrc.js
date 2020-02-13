@@ -34,6 +34,8 @@ module.exports = {
     'class-methods-use-this': 'off',
     'import/no-dynamic-require': 'off',
     'global-require': 'off',
-    'no-param-reassign': 'warn'
+    'no-param-reassign': 'warn',
+    'eslint-disable-next-line': 'off',
+    'node/no-deprecated-api': 'off'
   }
 };
