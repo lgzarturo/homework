@@ -4,48 +4,47 @@
  */
 
 // Dependencias libs
-const workers = require('./../lib/workers');
-
-const helpers = require('./../lib/helpers');
+const workers = require('../lib/workers')
+const helpers = require('../lib/helpers')
 // Controlador dependiendo la solicitud URI
-const handlers = {};
+const handlers = {}
 
-const logFileName = 'homework1';
+const logFileName = 'homework1'
 
 /**
  * URI /ping - Sirve para verificar si el servidor esta vivo.
  * @param data
  * @param callback
  */
-handlers.ping = function(data, callback) {
-  callback(200, { success: helpers.translate('success.ping', data.lang) });
-};
+handlers.ping = function (data, callback) {
+  callback(200, { success: helpers.translate('success.ping', data.lang) })
+}
 
 /**
  * URI /hello - Solo muestra un mensaje de bienvenida.
- * @param data
+ * @param req
  * @param callback - code: 200
  */
-handlers.hello = function(req, callback) {
+handlers.hello = function (req, callback) {
   const data = {
     success: helpers.translate('success.hello.world.pizza', req.headers['accept-language']),
-    data: helpers.translate('homework.one', req.headers['accept-language'])
-  };
-  workers.log(logFileName, data, 200, '/hello');
-  callback(200, data);
-};
+    data: helpers.translate('homework.one', req.headers['accept-language']),
+  }
+  workers.log(logFileName, data, 200, '/hello')
+  callback(200, data)
+}
 
 /**
  * URI por default - Si no cumple con ninguna ruta se devuelve un error 404
- * @param data
+ * @param req
  * @param callback 404
  */
-handlers.notFound = function(req, callback) {
+handlers.notFound = function (req, callback) {
   const data = {
-    error: helpers.translate('resource.not.found', req.headers['accept-language'])
-  };
-  workers.log(logFileName, data, 404, 'notFound');
-  callback(404, data);
-};
+    error: helpers.translate('resource.not.found', req.headers['accept-language']),
+  }
+  workers.log(logFileName, data, 404, 'notFound')
+  callback(404, data)
+}
 
-module.exports = handlers;
+module.exports = handlers

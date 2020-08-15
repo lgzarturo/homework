@@ -3,19 +3,19 @@
  */
 
 // Dependencias libs
-const server = require('./lib/server');
+const server = require('./lib/server')
 
-// Applicación
-const app = {};
+// Aplicación
+const app = {}
 
 // Inicializar
-app.init = function() {
+app.init = function () {
   // Ejecuta el servidor
-  server.init();
-};
+  server.init()
+}
 
 // Iniciar la aplicación
-app.init();
+app.init()
 
 // @ignore
-module.exports = app;
+module.exports = app

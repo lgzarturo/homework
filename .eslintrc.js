@@ -3,26 +3,26 @@ module.exports = {
     es6: true,
     commonjs: true,
     node: true,
-    browser: true
+    browser: true,
   },
   extends: ['airbnb-base', 'prettier', 'plugin:node/recommended'],
   plugins: ['prettier'],
   globals: {
     Atomics: 'readonly',
-    SharedArrayBuffer: 'readonly'
+    SharedArrayBuffer: 'readonly',
   },
   parserOptions: {
     ecmaVersion: 2018,
-    sourceType: 'module'
+    sourceType: 'module',
   },
   ecmaFeatures: {
     modules: true,
-    spread: true
+    spread: true,
   },
   rules: {
     indent: ['error', 2],
     quotes: ['error', 'single'],
-    semi: ['error', 'always'],
+    semi: ['error', 'never'],
     'no-console': 0,
     'linebreak-style': ['error', 'unix'],
     'no-unused-vars': 'warn',
@@ -36,6 +36,6 @@ module.exports = {
     'global-require': 'off',
     'no-param-reassign': 'warn',
     'eslint-disable-next-line': 'off',
-    'node/no-deprecated-api': 'off'
-  }
+    'node/no-deprecated-api': 'off',
+  },
 };

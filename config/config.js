@@ -3,7 +3,7 @@
  */
 
 // Variable para configurar los entornos de la aplicación
-const environments = {};
+const environments = {}
 
 /**
  * Staging (default) - Entorno de desarrollo
@@ -16,8 +16,8 @@ environments.staging = {
   hashingSecret: '08c1c0dae1dab39f5db54f286b5a75ae',
   tokenSize: 36,
   tokenDuration: 3600000,
-  maxChecks: 5
-};
+  maxChecks: 5,
+}
 
 /**
  * Production - Entorno de producción
@@ -30,11 +30,11 @@ environments.production = {
   hashingSecret: 'ad97c097cb5e3fe5baeeffcd67b6cedc',
   tokenSize: 36,
   tokenDuration: 3600000,
-  maxChecks: 5
-};
+  maxChecks: 5,
+}
 
-const currentEnvironment = typeof process.env.NODE_ENV === 'string' ? process.env.NODE_ENV.toLowerCase() : '';
+const currentEnvironment = typeof process.env.NODE_ENV === 'string' ? process.env.NODE_ENV.toLowerCase() : ''
 
-const environmentToExport = typeof environments[currentEnvironment] === 'object' ? environments[currentEnvironment] : environments.staging;
+const environmentToExport = typeof environments[currentEnvironment] === 'object' ? environments[currentEnvironment] : environments.staging
 
-module.exports = environmentToExport;
+module.exports = environmentToExport
