@@ -16,7 +16,7 @@ const handlers = {}
 handlers.cart = function (req, callback) {
   const acceptableMethods = ['post', 'get']
   if (acceptableMethods.indexOf(req.method) !== -1) {
-    handlers.shopping[req.method](req, callback)
+    handlers._shopping[req.method](req, callback)
   } else {
     callback(405, {
       error: helpers.translate('error.method.not.allowed', req.lang),
@@ -24,14 +24,14 @@ handlers.cart = function (req, callback) {
   }
 }
 
-handlers.shopping = {}
+handlers._shopping = {}
 
 /**
  * Shopping cart - get (URI: /shopping-car)
  * @param req
  * @param callback
  */
-handlers.shopping.get = function (req, callback) {
+handlers._shopping.get = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const token = typeof req.headers.token === 'string' ? req.headers.token : false
   const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false
@@ -63,7 +63,7 @@ handlers.shopping.get = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.shopping.post = function (req, callback) {
+handlers._shopping.post = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const token = typeof req.headers.token === 'string' ? req.headers.token : false
   const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false

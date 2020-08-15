@@ -17,20 +17,20 @@ const handlers = {}
 handlers.tokens = function (req, callback) {
   const acceptableMethods = ['post', 'get', 'put', 'delete']
   if (acceptableMethods.indexOf(req.method) !== -1) {
-    handlers.tokens[req.method](req, callback)
+    handlers._tokens[req.method](req, callback)
   } else {
     callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) })
   }
 }
 
-handlers.tokens = {}
+handlers._tokens = {}
 
 /**
  * Tokens - post (URI: /tokens)
  * @param req
  * @param callback
  */
-handlers.tokens.post = function (req, callback) {
+handlers._tokens.post = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const email = typeof req.payload.email === 'string' ? req.payload.email.trim() : false
   const password = typeof req.payload.password === 'string' && req.payload.password.trim().length > 0 ? req.payload.password.trim() : false
@@ -72,7 +72,7 @@ handlers.tokens.post = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.tokens.get = function (req, callback) {
+handlers._tokens.get = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const token = typeof req.queryStringObject.token === 'string' && req.queryStringObject.token.trim().length === config.tokenSize ? req.queryStringObject.token.trim() : false
 
@@ -96,7 +96,7 @@ handlers.tokens.get = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.tokens.put = function (req, callback) {
+handlers._tokens.put = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const token = typeof req.payload.token === 'string' && req.payload.token.trim().length === config.tokenSize ? req.payload.token.trim() : false
   const extended = typeof req.payload.extend === 'boolean' ? req.payload.extend : false
@@ -130,7 +130,7 @@ handlers.tokens.put = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.tokens.delete = function (req, callback) {
+handlers._tokens.delete = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const token = typeof req.queryStringObject.token === 'string' && req.queryStringObject.token.trim().length === config.tokenSize ? req.queryStringObject.token.trim() : false
 

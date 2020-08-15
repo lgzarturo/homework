@@ -13,11 +13,11 @@ const logFileName = 'homework1'
 
 /**
  * URI /ping - Sirve para verificar si el servidor esta vivo.
- * @param data
+ * @param req
  * @param callback
  */
-handlers.ping = function (data, callback) {
-  callback(200, { success: helpers.translate('success.ping', data.lang) })
+handlers.ping = (req, callback) => {
+  callback(200, { success: helpers.translate('success.ping', req.lang) })
 }
 
 /**
@@ -25,7 +25,7 @@ handlers.ping = function (data, callback) {
  * @param req
  * @param callback - code: 200
  */
-handlers.hello = function (req, callback) {
+handlers.hello = (req, callback) => {
   const data = {
     success: helpers.translate('success.hello.world.pizza', req.headers['accept-language']),
     data: helpers.translate('homework.one', req.headers['accept-language']),
@@ -39,7 +39,7 @@ handlers.hello = function (req, callback) {
  * @param req
  * @param callback 404
  */
-handlers.notFound = function (req, callback) {
+handlers.notFound = (req, callback) => {
   const data = {
     error: helpers.translate('resource.not.found', req.headers['accept-language']),
   }

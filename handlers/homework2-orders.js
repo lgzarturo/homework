@@ -18,13 +18,13 @@ const handlers = {}
 handlers.payments = function (req, callback) {
   const acceptableMethods = ['post', 'get']
   if (acceptableMethods.indexOf(req.method) !== -1) {
-    handlers.payments[req.method](req, callback)
+    handlers._payments[req.method](req, callback)
   } else {
     callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) })
   }
 }
 
-handlers.payments = {}
+handlers._payments = {}
 
 /**
  * Shopping cart - get (URI: /payments?order)
@@ -33,7 +33,7 @@ handlers.payments = {}
  * @example
  * curl -X GET 'http://{host}/payments?order={order}' -H 'email: {email}' -H 'token: {token}'
  */
-handlers.payments.get = function (req, callback) {
+handlers._payments.get = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const token = typeof req.headers.token === 'string' ? req.headers.token : false
   const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false
@@ -74,7 +74,7 @@ handlers.payments.get = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.payments.post = function (req, callback) {
+handlers._payments.post = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const token = typeof req.headers.token === 'string' ? req.headers.token : false
   const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false

@@ -3,7 +3,7 @@
  */
 
 // Dependencias libs
-const config = require('../config/config').default
+const config = require('../config/config')
 const data = require('../lib/data')
 const helpers = require('../lib/helpers')
 // Controlador dependiendo la solicitud URI
@@ -14,16 +14,16 @@ const handlers = {}
  * @param req
  * @param callback
  */
-handlers.checks = function (req, callback) {
+handlers.checks = (req, callback) => {
   const acceptableMethods = ['post', 'get', 'put', 'delete']
   if (acceptableMethods.indexOf(req.method) !== -1) {
-    handlers.checks[req.method](req, callback)
+    handlers._checks[req.method](req, callback)
   } else {
     callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) })
   }
 }
 
-handlers.checks = {}
+handlers._checks = {}
 
 const isValidMethod = (req) => {
   return ['get', 'post', 'put', 'delete'].indexOf(req.payload.method) !== -1
@@ -38,7 +38,7 @@ const isValidProtocol = (req) => {
  * @param req
  * @param callback
  */
-handlers.checks.post = function (req, callback) {
+handlers._checks.post = function (req, callback) {
   // Validar los parámetros de la solicitud
   const protocol = typeof req.payload.protocol === 'string' && isValidProtocol(req) ? req.payload.protocol : false
   const url = typeof req.payload.url === 'string' && req.payload.url.trim().length > 0 ? req.payload.url.trim() : false
@@ -107,7 +107,7 @@ handlers.checks.post = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.checks.get = function (req, callback) {
+handlers._checks.get = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const id = typeof req.queryStringObject.id === 'string' && req.queryStringObject.id.trim().length === 48 ? req.queryStringObject.id.trim() : false
   if (id) {
@@ -135,7 +135,7 @@ handlers.checks.get = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.checks.put = function (req, callback) {
+handlers._checks.put = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const id = typeof req.queryStringObject.id === 'string' && req.queryStringObject.id.trim().length === 48 ? req.queryStringObject.id.trim() : false
   const protocol = typeof req.payload.protocol === 'string' && isValidProtocol(req) ? req.payload.protocol : false
@@ -189,7 +189,7 @@ handlers.checks.put = function (req, callback) {
   }
 }
 
-handlers.checks.delete = function (req, callback) {
+handlers._checks.delete = function (req, callback) {
   const id = typeof req.queryStringObject.id === 'string' && req.queryStringObject.id.trim().length === 48 ? req.queryStringObject.id.trim() : false
   if (id) {
     data.read('checks', id, function (errRead, checkData) {

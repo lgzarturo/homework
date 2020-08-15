@@ -17,21 +17,21 @@ const handlers = {}
 handlers.items = function (req, callback) {
   const acceptableMethods = ['get']
   if (acceptableMethods.indexOf(req.method) !== -1) {
-    handlers.items[req.method](req, callback)
+    handlers._items[req.method](req, callback)
   } else {
     callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) })
   }
 }
 
 // Controlador dependiendo de la solicitud URI
-handlers.items = {}
+handlers._items = {}
 
 /**
  * URI /menu?code={?}
  * @param req
  * @param callback
  */
-handlers.items.get = function (req, callback) {
+handlers._items.get = function (req, callback) {
   // Validar los parámetros de la solicitud.
   const token = typeof req.headers.token === 'string' ? req.headers.token : false
   const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false
