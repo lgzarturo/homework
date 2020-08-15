@@ -1,0 +1,22 @@
+###
+# Verificar si el sistema esta en línea
+GET /ping HTTP/1.1
+Host: http://localhost:3000
+
+###
+# Registrar un usuario
+POST /api/users HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+
+{
+    "name": "abc",
+    "email": "abc@gmail.com",
+    "password": "122",
+    "streetAddress": ""
+}
+
+###
+# Obtener un usuario por medio del email
+GET /api/users?email=lgzarturo@gmail.com HTTP/1.1
+Host: {{host}}
