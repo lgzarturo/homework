@@ -1,7 +1,10 @@
 {
   "source": "./",
   "destination": "./docs",
-  "excludes": ["\\.eslintrc\\.js$", "docs/script/\\.js$"],
+  "excludes": [
+    "\\.eslintrc\\.js$",
+    "docs/script/\\.js$"
+  ],
   "plugins": [
     {
       "name": "esdoc-standard-plugin",
@@ -13,7 +16,11 @@
           "enable": true
         },
         "accessor": {
-          "access": ["public", "protected", "private"],
+          "access": [
+            "public",
+            "protected",
+            "private"
+          ],
           "autoPrivate": true
         },
         "undocumentIdentifier": {
@@ -26,7 +33,11 @@
           "enable": true
         },
         "manual": {
-          "files": ["./README.md", "./CHANGELOG.md", "./TODO.md"]
+          "files": [
+            "./README.md",
+            "./CHANGELOG.md",
+            "./TODO.md"
+          ]
         }
       }
     }

@@ -4,60 +4,57 @@
  */
 
 // Dependencias libs
-const data = require('./../lib/data');
-// @ignore
-const helpers = require('./../lib/helpers');
-
+const data = require('../lib/data')
+const helpers = require('../lib/helpers')
 // Controlador dependiendo la solicitud URI
-const handlers = {};
+const handlers = {}
 
 /**
- * Manejo de los metodos que seran aceptados en el controlador.
+ * Manejo de los métodos que serán aceptados en el controlador.
  * @param req
  * @param callback
  */
-handlers.items = function(req, callback) {
-  const acceptableMethods = ['get'];
-  if (acceptableMethods.indexOf(req.method) > -1) {
-    handlers.items[req.method](req, callback);
+handlers.items = function (req, callback) {
+  const acceptableMethods = ['get']
+  if (acceptableMethods.indexOf(req.method) !== -1) {
+    handlers.items[req.method](req, callback)
   } else {
-    callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) });
+    callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) })
   }
-};
+}
 
 // Controlador dependiendo de la solicitud URI
-handlers.items = {};
+handlers.items = {}
 
 /**
  * URI /menu?code={?}
  * @param req
  * @param callback
  */
-handlers.items.get = function(req, callback) {
+handlers.items.get = function (req, callback) {
   // Validar los parámetros de la solicitud.
-  const token = typeof req.headers.token === 'string' ? req.headers.token : false;
-  const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false;
-  const code = typeof req.queryStringObject.code === 'string' && req.queryStringObject.code.trim().length > 0 ? req.queryStringObject.code.trim() : false;
+  const token = typeof req.headers.token === 'string' ? req.headers.token : false
+  const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false
+  const code = typeof req.queryStringObject.code === 'string' && req.queryStringObject.code.trim().length > 0 ? req.queryStringObject.code.trim() : false
 
-  helpers.verifyToken(token, email, function(isValid) {
+  helpers.verifyToken(token, email, function (isValid) {
     // Verificar si el token es válido
     if (isValid) {
-      data.read('items', 'menu', function(errRead, dataItems) {
+      data.read('items', 'menu', function (errRead, dataItems) {
         if (!errRead && dataItems) {
           if (code) {
-            callback(200, dataItems[code]);
+            callback(200, dataItems[code])
           } else {
-            callback(200, dataItems);
+            callback(200, dataItems)
           }
         } else {
-          callback(400, { error: helpers.translate('error.data.not.available', req.lang) });
+          callback(400, { error: helpers.translate('error.data.not.available', req.lang) })
         }
-      });
+      })
     } else {
-      callback(403, { error: helpers.translate('error.token.invalid', req.lang) });
+      callback(403, { error: helpers.translate('error.token.invalid', req.lang) })
     }
-  });
-};
+  })
+}
 
-// @ignore
-module.exports = handlers;
+module.exports = handlers
