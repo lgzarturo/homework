@@ -1,7 +1,13 @@
 ###
 # Verificar si el sistema esta en línea
 GET /ping HTTP/1.1
-Host: http://localhost:3000
+Host: {{host}}
+
+###
+# Obtener un usuario por medio del email
+GET /api/users?email=lgzarturo@gmail.com HTTP/1.1
+Host: {{host}}
+token: {{token}}
 
 ###
 # Registrar un usuario
@@ -17,6 +23,53 @@ Content-Type: application/json
 }
 
 ###
-# Obtener un usuario por medio del email
-GET /api/users?email=lgzarturo@gmail.com HTTP/1.1
+# Actualizar los datos de un usuario
+PUT /api/users?email=lgzarturo@gmail.com HTTP/1.1
+Host: {{host}}
+token: {{token}}
+Content-Type: application/json
+
+{
+"name": "abc",
+"email": "lgzarturo@gmail.com",
+"password": "12345",
+"streetAddress": "-"
+}
+
+###
+# Borrar un usuario dependiendo el email y usando su token
+DELETE /api/users?email=abc@gmail.com HTTP/1.1
+Host: {{host}}
+token: {{token}}
+
+###
+# Generar un token para la autenticación del usuario
+POST /api/tokens HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+
+{
+"email": "lgzarturo@gmail.com",
+"password": "12345"
+}
+
+###
+# Obtener los datos del token
+GET /api/tokens?token={{token}} HTTP/1.1
+Host: {{host}}
+
+###
+# Extender la caducidad de un token
+PUT /api/tokens HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+
+{
+"token": "{{token}}",
+"extend": true
+}
+
+###
+# Eliminar un token
+DELETE /api/tokens?token={{token}} HTTP/1.1
 Host: {{host}}

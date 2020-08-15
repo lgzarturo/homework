@@ -3,7 +3,7 @@
  */
 
 // Dependencias libs
-const config = require('../config/config').default
+const config = require('../config/config')
 const data = require('../lib/data')
 const helpers = require('../lib/helpers')
 // Controlador dependiendo la solicitud URI
