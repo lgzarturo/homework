@@ -27,8 +27,8 @@ handlers.ping = (req, callback) => {
  */
 handlers.hello = (req, callback) => {
   const data = {
-    success: helpers.translate('success.hello.world.pizza', req.headers['accept-language']),
-    data: helpers.translate('homework.one', req.headers['accept-language']),
+    success: helpers.translate('success.hello.world.pizza', req.lang),
+    data: helpers.translate('homework.one', req.lang),
   }
   workers.log(logFileName, data, 200, '/hello')
   callback(200, data)
@@ -41,7 +41,7 @@ handlers.hello = (req, callback) => {
  */
 handlers.notFound = (req, callback) => {
   const data = {
-    error: helpers.translate('resource.not.found', req.headers['accept-language']),
+    error: helpers.translate('resource.not.found', req.lang),
   }
   workers.log(logFileName, data, 404, 'notFound')
   callback(404, data)

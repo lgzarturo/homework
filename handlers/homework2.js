@@ -18,8 +18,8 @@ const logFileName = 'homework2'
  */
 handlers.pizza = (req, callback) => {
   const requestData = {
-    success: helpers.translate('success.pizza.response', req.headers['accept-language']),
-    data: helpers.translate('homework.two', req.headers['accept-language']),
+    success: helpers.translate('success.pizza.response', req.lang),
+    data: helpers.translate('homework.two', req.lang),
   }
   workers.log(logFileName, requestData, 200, '/pizza')
   callback(200, requestData)

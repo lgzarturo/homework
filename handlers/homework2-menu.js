@@ -6,6 +6,7 @@
 // Dependencias libs
 const data = require('../lib/data')
 const helpers = require('../lib/helpers')
+const validators = require('../validation/request_validation')
 // Controlador dependiendo la solicitud URI
 const handlers = {}
 
@@ -14,9 +15,8 @@ const handlers = {}
  * @param req
  * @param callback
  */
-handlers.items = function (req, callback) {
-  const acceptableMethods = ['get']
-  if (acceptableMethods.indexOf(req.method) !== -1) {
+handlers.items = (req, callback) => {
+  if (validators.isValidMethod(req.method, ['get'])) {
     handlers._items[req.method](req, callback)
   } else {
     callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) })
@@ -31,16 +31,16 @@ handlers._items = {}
  * @param req
  * @param callback
  */
-handlers._items.get = function (req, callback) {
+handlers._items.get = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const token = typeof req.headers.token === 'string' ? req.headers.token : false
-  const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false
-  const code = typeof req.queryStringObject.code === 'string' && req.queryStringObject.code.trim().length > 0 ? req.queryStringObject.code.trim() : false
+  const token = validators.isValidTokenField(req.headers.token)
+  const email = validators.isValidEmailField(req.headers.email)
+  const code = validators.isValidTextField(req.queryStringObject.code)
 
-  helpers.verifyToken(token, email, function (isValid) {
+  helpers.verifyToken(token, email, (isValid) => {
     // Verificar si el token es válido
     if (isValid) {
-      data.read('items', 'menu', function (errRead, dataItems) {
+      data.read('items', 'menu', (errRead, dataItems) => {
         if (!errRead && dataItems) {
           if (code) {
             callback(200, dataItems[code])

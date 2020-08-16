@@ -39,4 +39,8 @@ module.exports = {
   'error.check.user.found': 'No se pudo encontrar el usuario que creo el registro del check.',
   'error.record.delete': 'Error no se ha podido eliminar el registro indicado.',
   'error.record.updated': 'Error al actualizar la información del registro.',
+  'error.data.not.added.to.order': 'No se pudo agregar el artículo a la orden de compra.',
+  'error.item.not.exists': 'El artículo no se puede agregar al carrito de compras.',
+  'error.sent.sms': 'No se pudo realizar el envío de la notificación.',
+  'success.sent.sms': 'Se ha enviado la notificación.',
 }

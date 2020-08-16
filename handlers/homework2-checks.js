@@ -6,6 +6,8 @@
 const config = require('../config/config')
 const data = require('../lib/data')
 const helpers = require('../lib/helpers')
+const validators = require('../validation/request_validation')
+const cleaners = require('../validation/request_clean')
 // Controlador dependiendo la solicitud URI
 const handlers = {}
 
@@ -15,8 +17,7 @@ const handlers = {}
  * @param callback
  */
 handlers.checks = (req, callback) => {
-  const acceptableMethods = ['post', 'get', 'put', 'delete']
-  if (acceptableMethods.indexOf(req.method) !== -1) {
+  if (validators.isValidMethod(req.method)) {
     handlers._checks[req.method](req, callback)
   } else {
     callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) })
@@ -25,37 +26,29 @@ handlers.checks = (req, callback) => {
 
 handlers._checks = {}
 
-const isValidMethod = (req) => {
-  return ['get', 'post', 'put', 'delete'].indexOf(req.payload.method) !== -1
-}
-
-const isValidProtocol = (req) => {
-  return ['http', 'https'].indexOf(req.payload.protocol) !== -1
-}
-
 /**
  * Checks - post (URI: /checks)
  * @param req
  * @param callback
  */
-handlers._checks.post = function (req, callback) {
+handlers._checks.post = (req, callback) => {
   // Validar los parámetros de la solicitud
-  const protocol = typeof req.payload.protocol === 'string' && isValidProtocol(req) ? req.payload.protocol : false
-  const url = typeof req.payload.url === 'string' && req.payload.url.trim().length > 0 ? req.payload.url.trim() : false
-  const method = typeof req.payload.method === 'string' && isValidMethod(req) ? req.payload.method : false
-  const successCodes = typeof req.payload.successCodes === 'object' && req.payload.successCodes instanceof Array && req.payload.successCodes.length > 0 ? req.payload.successCodes : false
-  const timeoutSeconds = typeof req.payload.timeoutSeconds === 'number' && req.payload.timeoutSeconds % 1 === 0 && req.payload.timeoutSeconds >= 1 && req.payload.timeoutSeconds <= 5 ? req.payload.timeoutSeconds : false
+  const protocol = validators.isValidProtocolValue(req.payload.protocol)
+  const url = validators.isValidTextField(req.payload.url)
+  const method = validators.isValidMethodValue(req.payload.method)
+  const successCodes = validators.isValidArrayObject(req.payload.successCodes)
+  const timeoutSeconds = validators.isValidTimeInSeconds(req.payload.timeoutSeconds)
 
   if (protocol && url && method && successCodes && timeoutSeconds) {
-    const token = typeof req.headers.token === 'string' ? req.headers.token : false
+    const token = validators.isValidTokenField(req.headers.token)
     if (token) {
-      data.read('tokens', token, function (errRead, tokenData) {
+      data.read('tokens', token, (errRead, tokenData) => {
         if (!errRead && tokenData) {
           const userEmail = tokenData.email
 
-          data.read('users', userEmail, function (errReadUsers, userData) {
+          data.read('users', userEmail, (errReadUsers, userData) => {
             if (!errReadUsers && userData) {
-              const userChecks = typeof userData.checks === 'object' && userData.checks instanceof Array && userData.checks.length > 0 ? userData.checks : []
+              const userChecks = cleaners.getValidArrayObject(userData.checks)
               if (userChecks.length < config.maxChecks) {
                 const checkId = helpers.createRandomString(48)
                 const checkObject = {
@@ -67,12 +60,13 @@ handlers._checks.post = function (req, callback) {
                   successCodes: successCodes,
                   timeoutSeconds: timeoutSeconds,
                 }
-                data.create('checks', checkId, checkObject, function (errCreate) {
+
+                data.create('checks', checkId, checkObject, (errCreate) => {
                   if (!errCreate) {
                     // Agregar el check al usuario
                     userData.checks = userChecks
                     userData.checks.push(checkId)
-                    data.update('users', userEmail, userData, function (errUpdate) {
+                    data.update('users', userEmail, userData, (errUpdate) => {
                       if (!errUpdate) {
                         callback(200, checkObject)
                       } else {
@@ -107,14 +101,15 @@ handlers._checks.post = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers._checks.get = function (req, callback) {
+handlers._checks.get = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const id = typeof req.queryStringObject.id === 'string' && req.queryStringObject.id.trim().length === 48 ? req.queryStringObject.id.trim() : false
+  const id = validators.isValidTextFieldSize(req.queryStringObject.id, 48)
+  console.log({ id })
   if (id) {
-    data.read('checks', id, function (err, checkData) {
+    data.read('checks', id, (err, checkData) => {
       if (!err && checkData) {
-        const token = typeof req.headers.token === 'string' ? req.headers.token : false
-        helpers.verifyToken(token, checkData.userEmail, function (isValid) {
+        const token = validators.isValidTokenField(req.headers.token)
+        helpers.verifyToken(token, checkData.userEmail, (isValid) => {
           if (isValid) {
             callback(200, checkData)
           } else {
@@ -135,21 +130,21 @@ handlers._checks.get = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers._checks.put = function (req, callback) {
+handlers._checks.put = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const id = typeof req.queryStringObject.id === 'string' && req.queryStringObject.id.trim().length === 48 ? req.queryStringObject.id.trim() : false
-  const protocol = typeof req.payload.protocol === 'string' && isValidProtocol(req) ? req.payload.protocol : false
-  const url = typeof req.payload.url === 'string' && req.payload.url.trim().length > 0 ? req.payload.url.trim() : false
-  const method = typeof req.payload.method === 'string' && isValidMethod(req) ? req.payload.method : false
-  const successCodes = typeof req.payload.successCodes === 'object' && req.payload.successCodes instanceof Array && req.payload.successCodes.length > 0 ? req.payload.successCodes : false
-  const timeoutSeconds = typeof req.payload.timeoutSeconds === 'number' && req.payload.timeoutSeconds % 1 === 0 && req.payload.timeoutSeconds >= 1 && req.payload.timeoutSeconds <= 5 ? req.payload.timeoutSeconds : false
+  const id = validators.isValidTextFieldSize(req.queryStringObject.id, 48)
+  const protocol = validators.isValidProtocolValue(req.payload.protocol)
+  const url = validators.isValidTextField(req.payload.url)
+  const method = validators.isValidMethodValue(req.payload.method)
+  const successCodes = validators.isValidArrayObject(req.payload.successCodes)
+  const timeoutSeconds = validators.isValidTimeInSeconds(req.payload.timeoutSeconds)
 
   if (id) {
     if (protocol || url || method || successCodes || timeoutSeconds) {
-      data.read('checks', id, function (errRead, checkData) {
+      data.read('checks', id, (errRead, checkData) => {
         if (!errRead && checkData) {
-          const token = typeof req.headers.token === 'string' ? req.headers.token : false
-          helpers.verifyToken(token, checkData.userEmail, function (isValid) {
+          const token = validators.isValidTokenField(req.headers.token)
+          helpers.verifyToken(token, checkData.userEmail, (isValid) => {
             if (isValid) {
               if (protocol) {
                 checkData.protocol = protocol
@@ -166,7 +161,7 @@ handlers._checks.put = function (req, callback) {
               if (timeoutSeconds) {
                 checkData.timeoutSeconds = timeoutSeconds
               }
-              data.update('checks', id, checkData, function (err) {
+              data.update('checks', id, checkData, (err) => {
                 if (!err) {
                   callback(200, checkData)
                 } else {
@@ -189,23 +184,23 @@ handlers._checks.put = function (req, callback) {
   }
 }
 
-handlers._checks.delete = function (req, callback) {
-  const id = typeof req.queryStringObject.id === 'string' && req.queryStringObject.id.trim().length === 48 ? req.queryStringObject.id.trim() : false
+handlers._checks.delete = (req, callback) => {
+  const id = validators.isValidTextFieldSize(req.queryStringObject.id, 48)
   if (id) {
-    data.read('checks', id, function (errRead, checkData) {
+    data.read('checks', id, (errRead, checkData) => {
       if (!errRead && checkData) {
-        const token = typeof req.headers.token === 'string' ? req.headers.token : false
-        helpers.verifyToken(token, checkData.userEmail, function (isValid) {
+        const token = validators.isValidTokenField(req.headers.token)
+        helpers.verifyToken(token, checkData.userEmail, (isValid) => {
           if (isValid) {
-            data.delete('checks', id, function (errDelete) {
+            data.delete('checks', id, (errDelete) => {
               if (!errDelete) {
-                data.read('users', checkData.userEmail, function (errReadUsers, userData) {
+                data.read('users', checkData.userEmail, (errReadUsers, userData) => {
                   if (!errReadUsers && userData) {
-                    const userChecks = typeof userData.checks === 'object' && userData.checks instanceof Array && userData.checks.length > 0 ? userData.checks : []
+                    const userChecks = cleaners.getValidArrayObject(userData.checks)
                     const checkPosition = userChecks.indexOf(id)
                     if (checkPosition > -1) {
                       userChecks.splice(checkPosition, 1)
-                      data.update('users', checkData.userEmail, userData, function (err) {
+                      data.update('users', checkData.userEmail, userData, (err) => {
                         if (!err) {
                           callback(204)
                         } else {
