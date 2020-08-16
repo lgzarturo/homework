@@ -1,6 +1,7 @@
 # Change Log
 
-Proyecto Pizza Pirple.
+Proyecto Pirple
+
 Tareas de curso de Node JS
 
 ## [Unreleased]
@@ -23,7 +24,7 @@ Tareas de curso de Node JS
 ### Added
 
 - Se agregaron los centavos en las transacciones del Stripe.
-- Se agrego el reenvió del comprobante de pago, mediante el número de orden.
+- Sé agrego él re-envió del comprobante de pago, mediante el número de orden.
 - Se modificaron las definiciones de las variables [Airbnb JavaScript Style](https://github.com/airbnb/javascript).
 - Se incluye la documentación de las funciones del código.
 - Se cambiaron las respuestas de los códigos de la API, para que [cumplan con un estándar](https://www.restapitutorial.com/httpstatuscodes.html).
@@ -32,7 +33,7 @@ Tareas de curso de Node JS
 
 ### Added
 
-- Se valido el funcionamiento del API mediante Postman
+- Sé valido el funcionamiento del API mediante Postman
 - /hello: La ruta de la tarea 1.
 - /pizza: El acceso a la creación del registro en el log.
 - /users: El CRUD funciona correctamente para la administración de usuarios.
@@ -42,7 +43,7 @@ Tareas de curso de Node JS
 - /shopping-cart: Con el método get se obtiene el listado de items del carrito de compras y con el método post se agregan elementos al carrito.
 - /payments: se agregan los datos de la tarjeta de crédito de pruebas
 - /payments: al procesar el pago de la orden se enviá un correo con la confirmación.
-- /payments?order=?: se solicita el reenvió de la orden
+- /payments?order=?: se solicita él reenvió de la orden
 
 ### Changed
 
@@ -51,7 +52,6 @@ Tareas de curso de Node JS
 ### Added
 
 - Commits on Oct 15, 2018: Se integraron las API de Stripe y Mailgun
-- Commits on Oct 11, 2018: Identaciones
 - Commits on Oct 9, 2018: logs, workers, data y handlers
 - Commits on Oct 8, 2018: Se agregó la licencia MIT
 - Commits on Oct 3, 2018: Homework #1

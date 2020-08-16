@@ -29,4 +29,8 @@ module.exports = {
   'error.user.password.encrypt': 'The user could not be generated, error with the password.',
   'error.user.deleted': 'The specified user could not be deleted.',
   'error.user.updated': 'The user could not be updated.',
+  'error.data.not.added.to.order': 'The item could not be added to the purchase order.',
+  'error.item.not.exists': 'The item cannot be added to the shopping cart.',
+  'error.sent.sms': 'The notification could not be sent.',
+  'success.sent.sms': 'The notification has been sent.',
 }

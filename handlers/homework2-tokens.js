@@ -3,9 +3,10 @@
  */
 
 // Dependencias libs
-const config = require('../config/config').default
+const config = require('../config/config')
 const data = require('../lib/data')
 const helpers = require('../lib/helpers')
+const validators = require('../validation/request_validation')
 // Controlador dependiendo la solicitud URI
 const handlers = {}
 
@@ -14,29 +15,28 @@ const handlers = {}
  * @param req
  * @param callback
  */
-handlers.tokens = function (req, callback) {
-  const acceptableMethods = ['post', 'get', 'put', 'delete']
-  if (acceptableMethods.indexOf(req.method) !== -1) {
-    handlers.tokens[req.method](req, callback)
+handlers.tokens = (req, callback) => {
+  if (validators.isValidMethod(req.method)) {
+    handlers._tokens[req.method](req, callback)
   } else {
     callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) })
   }
 }
 
-handlers.tokens = {}
+handlers._tokens = {}
 
 /**
  * Tokens - post (URI: /tokens)
  * @param req
  * @param callback
  */
-handlers.tokens.post = function (req, callback) {
+handlers._tokens.post = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const email = typeof req.payload.email === 'string' ? req.payload.email.trim() : false
-  const password = typeof req.payload.password === 'string' && req.payload.password.trim().length > 0 ? req.payload.password.trim() : false
+  const email = validators.isValidEmailField(req.payload.email)
+  const password = validators.isValidPasswordField(req.payload.password)
 
   if (email && password) {
-    data.read('users', email, function (errRead, user) {
+    data.read('users', email, (errRead, user) => {
       if (!errRead && user) {
         const hashedPassword = helpers.hash(password)
         if (hashedPassword === user.password) {
@@ -48,7 +48,7 @@ handlers.tokens.post = function (req, callback) {
             expires: expires,
           }
 
-          data.create('tokens', token, object, function (errCreate) {
+          data.create('tokens', token, object, (errCreate) => {
             if (!errCreate) {
               callback(200, object)
             } else {
@@ -72,12 +72,12 @@ handlers.tokens.post = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.tokens.get = function (req, callback) {
+handlers._tokens.get = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const token = typeof req.queryStringObject.token === 'string' && req.queryStringObject.token.trim().length === config.tokenSize ? req.queryStringObject.token.trim() : false
+  const token = validators.isValidTokenField(req.queryStringObject.token)
 
   if (token) {
-    data.read('tokens', token, function (err, dataToken) {
+    data.read('tokens', token, (err, dataToken) => {
       if (!err && dataToken) {
         callback(200, dataToken)
       } else {
@@ -96,17 +96,17 @@ handlers.tokens.get = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.tokens.put = function (req, callback) {
+handlers._tokens.put = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const token = typeof req.payload.token === 'string' && req.payload.token.trim().length === config.tokenSize ? req.payload.token.trim() : false
-  const extended = typeof req.payload.extend === 'boolean' ? req.payload.extend : false
+  const token = validators.isValidTokenField(req.payload.token)
+  const extended = validators.isValidBooleanField(req.payload.extend)
 
   if (token && extended) {
-    data.read('tokens', token, function (err, dataToken) {
+    data.read('tokens', token, (err, dataToken) => {
       if (!err && dataToken) {
         if (dataToken.expires > Date.now()) {
           dataToken.expires = Date.now() + config.tokenDuration
-          data.update('tokens', token, dataToken, function (errUpdate) {
+          data.update('tokens', token, dataToken, (errUpdate) => {
             if (!errUpdate) {
               callback(200, dataToken)
             } else {
@@ -130,14 +130,14 @@ handlers.tokens.put = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.tokens.delete = function (req, callback) {
+handlers._tokens.delete = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const token = typeof req.queryStringObject.token === 'string' && req.queryStringObject.token.trim().length === config.tokenSize ? req.queryStringObject.token.trim() : false
+  const token = validators.isValidTokenField(req.queryStringObject.token)
 
   if (token) {
-    data.read('tokens', token, function (errRead, dataToken) {
+    data.read('tokens', token, (errRead, dataToken) => {
       if (!errRead && dataToken) {
-        data.delete('tokens', token, function (errDelete) {
+        data.delete('tokens', token, (errDelete) => {
           if (!errDelete) {
             callback(204)
           } else {

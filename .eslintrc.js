@@ -37,5 +37,6 @@ module.exports = {
     'no-param-reassign': 'warn',
     'eslint-disable-next-line': 'off',
     'node/no-deprecated-api': 'off',
+		'no-underscore-dangle': 'off',
   },
 };

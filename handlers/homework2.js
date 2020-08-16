@@ -13,13 +13,13 @@ const logFileName = 'homework2'
 
 /**
  * URI /pizza
- * @param data
+ * @param req
  * @param callback
  */
-handlers.pizza = function (data, callback) {
+handlers.pizza = (req, callback) => {
   const requestData = {
-    success: helpers.translate('success.pizza.response', data.headers['accept-language']),
-    data: helpers.translate('homework.two', data.headers['accept-language']),
+    success: helpers.translate('success.pizza.response', req.lang),
+    data: helpers.translate('homework.two', req.lang),
   }
   workers.log(logFileName, requestData, 200, '/pizza')
   callback(200, requestData)
