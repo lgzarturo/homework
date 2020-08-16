@@ -1,5 +1,5 @@
 /**
- * Homework 2 - Controlador del CRUD Token
+ * Homework 2 - Controlador para el registro de checks
  */
 
 // Dependencias libs

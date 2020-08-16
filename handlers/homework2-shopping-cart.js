@@ -1,5 +1,5 @@
 /**
- * Homework 2 - Controlador del CRUD User
+ * Homework 2 - Controlador para realizar el pago del carrito de compras
  */
 
 // Dependencias libs
