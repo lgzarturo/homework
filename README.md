@@ -23,6 +23,10 @@ Paso 5 : Se retorna el objeto en String JSON y el código correspondiente.
 - Los usuarios podrán crear ordenes de compra y realizar su pago con Stripe
 - Se debe enviar notificaciones por correo mediante Mailgun
 
+> El archivo **data-test.zip.zip** contiene los archivos con los datos de prueba del sistema deben copiarse a la carpeta **.data**
+
+> El archivo **.data/api-keys.json** debe contener los datos de configuración para las API's de stripe, mailgun y twilio
+
 ### Validación de la tarea 2
 
 Sé valido el funcionamiento del API mediante Postman, los endpoints disponibles son:
