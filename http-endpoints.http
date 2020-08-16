@@ -1,0 +1,181 @@
+###
+# Verificar si el sistema esta en línea
+GET /ping HTTP/1.1
+Host: {{host}}
+
+###
+# Obtener un usuario por medio del email
+GET /api/users?email=lgzarturo@gmail.com HTTP/1.1
+Host: {{host}}
+token: {{token}}
+
+###
+# Registrar un usuario
+POST /api/users HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+
+{
+    "name": "abc",
+    "email": "abc@gmail.com",
+    "password": "122",
+    "streetAddress": ""
+}
+
+###
+# Actualizar los datos de un usuario
+PUT /api/users?email=lgzarturo@gmail.com HTTP/1.1
+Host: {{host}}
+token: {{token}}
+Content-Type: application/json
+
+{
+"name": "abc",
+"email": "lgzarturo@gmail.com",
+"password": "12345",
+"streetAddress": "-"
+}
+
+###
+# Borrar un usuario dependiendo el email y usando su token
+DELETE /api/users?email=abc@gmail.com HTTP/1.1
+Host: {{host}}
+token: {{token}}
+
+###
+# Generar un token para la autenticación del usuario
+POST /api/tokens HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+
+{
+"email": "lgzarturo@gmail.com",
+"password": "12345"
+}
+
+###
+# Obtener los datos del token
+GET /api/tokens?token={{token}} HTTP/1.1
+Host: {{host}}
+
+###
+# Extender la caducidad de un token
+PUT /api/tokens HTTP/1.1
+Host: {{host}}
+Content-Type: application/json
+
+{
+"token": "{{token}}",
+"extend": true
+}
+
+###
+# Eliminar un token
+DELETE /api/tokens?token={{token}} HTTP/1.1
+Host: {{host}}
+
+###
+# Crear un registro de check
+POST /api/checks HTTP/1.1
+Host: {{host}}
+token: {{token}}
+Content-Type: application/json
+
+{
+"protocol": "https",
+"url": "https://arthurolg.com",
+"method": "get",
+"successCodes": [200, 201],
+"timeoutSeconds": 5
+}
+
+###
+# Obtener un registro de check por su id
+GET /api/checks?id={{checkId}} HTTP/1.1
+Host: {{host}}
+token: {{token}}
+
+###
+# Actualizar un registro de check
+PUT /api/checks?id={{checkId}} HTTP/1.1
+Host: {{host}}
+token: {{token}}
+Content-Type: application/json
+
+{
+"protocol": "https",
+"url": "http://webdeveloperhints.com",
+"method": "get",
+"successCodes": [200, 201],
+"timeoutSeconds": 5
+}
+
+###
+# Borrar un registro de check
+DELETE /api/checks?id={{checkId}} HTTP/1.1
+Host: {{host}}
+token: {{token}}
+
+###
+# Ver el listado de items del menu
+GET /api/menu HTTP/1.1
+Host: {{host}}
+token: {{token}}
+email: lgzarturo@gmail.com
+
+###
+# Ver un item del menu
+GET /api/menu?code={{itemCode}} HTTP/1.1
+Host: {{host}}
+token: {{token}}
+email: lgzarturo@gmail.com
+
+###
+# Agregar items al carrito de compras
+POST /api/shopping-cart HTTP/1.1
+Host: {{host}}
+token: {{token}}
+email: lgzarturo@gmail.com
+Content-Type: application/json
+
+{
+"code": "5",
+"quantity": 3
+}
+
+###
+# Obtener el detalle del carrito de compras
+GET /api/shopping-cart HTTP/1.1
+Host: {{host}}
+token: {{token}}
+email: lgzarturo@gmail.com
+
+###
+# Realizar el pago del carrito de compras
+POST /api/payments HTTP/1.1
+Host: {{host}}
+token: {{token}}
+email: lgzarturo@gmail.com
+Content-Type: application/json
+
+{
+"creditCard": "4242424242424242",
+"validMonth": 3,
+"validYear": 2022,
+"codeCard": 123
+}
+
+###
+# Re-enviar la notificación del pago
+GET /api/payments?order={{order}} HTTP/1.1
+Host: {{host}}
+token: {{token}}
+email: lgzarturo@gmail.com
+
+###
+# Enviar mensaje sms
+GET /api/sms?order={{order}} HTTP/1.1
+Host: {{host}}
+token: {{token}}
+email: lgzarturo@gmail.com
+phone: {{phone}}

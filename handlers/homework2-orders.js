@@ -1,5 +1,5 @@
 /**
- * Homework 2 - Controlador del CRUD User
+ * Homework 2 - Controlador el procesamiento de las ordenes
  */
 
 // Dependencias node
@@ -7,6 +7,8 @@ const querystring = require('querystring')
 // Dependencias libs
 const data = require('../lib/data')
 const helpers = require('../lib/helpers')
+const validators = require('../validation/request_validation')
+const cleaners = require('../validation/request_clean')
 // Controlador dependiendo la solicitud URI
 const handlers = {}
 
@@ -15,16 +17,15 @@ const handlers = {}
  * @param req
  * @param callback
  */
-handlers.payments = function (req, callback) {
-  const acceptableMethods = ['post', 'get']
-  if (acceptableMethods.indexOf(req.method) !== -1) {
-    handlers.payments[req.method](req, callback)
+handlers.payments = (req, callback) => {
+  if (validators.isValidMethod(req.method, ['post', 'get'])) {
+    handlers._payments[req.method](req, callback)
   } else {
     callback(405, { error: helpers.translate('error.method.not.allowed', req.lang) })
   }
 }
 
-handlers.payments = {}
+handlers._payments = {}
 
 /**
  * Shopping cart - get (URI: /payments?order)
@@ -33,15 +34,15 @@ handlers.payments = {}
  * @example
  * curl -X GET 'http://{host}/payments?order={order}' -H 'email: {email}' -H 'token: {token}'
  */
-handlers.payments.get = function (req, callback) {
+handlers._payments.get = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const token = typeof req.headers.token === 'string' ? req.headers.token : false
-  const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false
-  const order = typeof req.queryStringObject.order === 'string' && req.queryStringObject.order.trim().length > 0 ? req.queryStringObject.order.trim() : false
+  const token = validators.isValidTokenField(req.headers.token)
+  const email = validators.isValidEmailField(req.headers.email)
+  const order = validators.isValidTextField(req.queryStringObject.order)
 
-  helpers.verifyToken(token, email, function (isValid) {
+  helpers.verifyToken(token, email, (isValid) => {
     if (isValid) {
-      data.read('payments', order, function (errRead, dataOrder) {
+      data.read('payments', order, (errRead, dataOrder) => {
         const message = `
           <p>Pago procesado con la tarjeta '${dataOrder.payload.cc}' (${dataOrder.payload.source})</p>
           <h3>Descripción</h3>
@@ -57,7 +58,7 @@ handlers.payments.get = function (req, callback) {
           Gracias por su pago
         `
 
-        helpers.mailgun(email, `Orden #${order}`, message, function (errMailgun) {
+        helpers.mailgun(email, `Orden #${order}`, message, (errMailgun) => {
           if (!errMailgun) {
             callback(200, { success: helpers.translate('success.sent.payment.confirm', req.lang) })
           } else {
@@ -74,20 +75,20 @@ handlers.payments.get = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.payments.post = function (req, callback) {
+handlers._payments.post = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const token = typeof req.headers.token === 'string' ? req.headers.token : false
-  const email = typeof req.headers.email === 'string' && req.headers.email.trim().length > 0 ? req.headers.email : false
-  const creditCart = typeof req.payload.creditCart === 'string' && req.payload.creditCart.trim().length > 0 ? req.payload.creditCart.trim() : false
-  const validMonth = typeof req.payload.validMonth === 'number' && req.payload.validMonth >= 1 && req.payload.validMonth <= 12 ? req.payload.validMonth : false
-  const validYear = typeof req.payload.validYear === 'number' && req.payload.validYear >= 2018 ? req.payload.validYear : false
-  const codeCard = typeof req.payload.codeCard === 'string' && req.payload.codeCard.trim().length === 3 ? req.payload.codeCard : false
+  const token = validators.isValidTokenField(req.headers.token)
+  const email = validators.isValidEmailField(req.headers.email)
+  const creditCard = validators.isValidCardNumber(req.payload.creditCard)
+  const validMonth = validators.isValidMonthOfYear(req.payload.validMonth)
+  const validYear = validators.isValidYear(req.payload.validYear)
+  const codeCard = validators.isValidCardCvv(req.payload.codeCard)
 
-  helpers.verifyToken(token, email, function (isValid) {
+  helpers.verifyToken(token, email, (isValid) => {
     if (isValid) {
-      data.read('users', email, function (errRead, userData) {
+      data.read('users', email, (errRead, userData) => {
         if (!errRead) {
-          data.read('orders', email, function (errReadOrders, dataOrder) {
+          data.read('orders', email, (errReadOrders, dataOrder) => {
             if (!errReadOrders && dataOrder) {
               let quantityItems = 0
               let totalItems = 0
@@ -95,9 +96,9 @@ handlers.payments.post = function (req, callback) {
               const currency = 'usd'
               const source = 'tok_visa'
               const orderId = `${helpers.createRandomString(16)}-${Date.now()}`
-              const items = typeof dataOrder === 'object' && dataOrder instanceof Array ? dataOrder : []
+              const items = cleaners.getValidArrayObject(dataOrder)
 
-              items.forEach(function (item) {
+              items.forEach((item) => {
                 quantityItems += item.quantity
                 const total = item.quantity * item.price
                 totalItems += total
@@ -106,7 +107,7 @@ handlers.payments.post = function (req, callback) {
 
               // Proceder al pago
               const payload = {
-                cc: creditCart,
+                cc: creditCard,
                 month: validMonth,
                 year: validYear,
                 code: codeCard,
@@ -118,7 +119,7 @@ handlers.payments.post = function (req, callback) {
                 orderId: orderId,
               }
 
-              helpers.stripe(payload, function (errStripe) {
+              helpers.stripe(payload, (errStripe) => {
                 if (errStripe) {
                   callback(500, { error: helpers.translate('error.process.payment', req.lang) })
                 } else {
@@ -140,7 +141,7 @@ handlers.payments.post = function (req, callback) {
                     </code>
                   `
 
-                  helpers.mailgun(email, payload.description, message, function (errMailgun) {
+                  helpers.mailgun(email, payload.description, message, (errMailgun) => {
                     if (errMailgun) {
                       callback(500, {
                         error: helpers.translate('error.sent.payment.confirm', req.lang),
@@ -159,7 +160,7 @@ handlers.payments.post = function (req, callback) {
                     payloadString: payloadString,
                   }
 
-                  data.create('payments', orderId, payment, function (errCreate) {
+                  data.create('payments', orderId, payment, (errCreate) => {
                     if (!errCreate) {
                       callback(200, payment)
                     } else {

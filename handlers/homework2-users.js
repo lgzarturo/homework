@@ -5,6 +5,8 @@
 // Dependencias libs
 const data = require('../lib/data')
 const helpers = require('../lib/helpers')
+const validators = require('../validation/request_validation')
+const checkers = require('../validation/request_clean')
 // Controlador dependiendo la solicitud URI
 const handlers = {}
 
@@ -14,10 +16,9 @@ const handlers = {}
  * @param req
  * @param callback
  */
-handlers.users = function (req, callback) {
-  const acceptableMethods = ['post', 'get', 'put', 'delete']
-  if (acceptableMethods.indexOf(req.method) !== -1) {
-    handlers.users[req.method](req, callback)
+handlers.users = (req, callback) => {
+  if (validators.isValidMethod(req.method)) {
+    handlers._users[req.method](req, callback)
   } else {
     callback(405, {
       error: helpers.translate('error.method.not.allowed', req.lang),
@@ -25,22 +26,22 @@ handlers.users = function (req, callback) {
   }
 }
 
-handlers.users = {}
+handlers._users = {}
 
 /**
  * Users - post (URI: /users)
  * @param req
  * @param callback
  */
-handlers.users.post = function (req, callback) {
+handlers._users.post = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const name = typeof req.payload.name === 'string' && req.payload.name.trim().length > 0 ? req.payload.name.trim() : false
-  const email = typeof req.payload.email === 'string' && req.payload.email.trim().length > 0 ? req.payload.email.trim() : false
-  const password = typeof req.payload.password === 'string' && req.payload.password.trim().length > 0 ? req.payload.password.trim() : false
-  const streetAddress = typeof req.payload.streetAddress === 'string' ? req.payload.streetAddress.trim() : false
+  const name = validators.isValidTextField(req.payload.name)
+  const email = validators.isValidEmailField(req.payload.email)
+  const password = validators.isValidPasswordField(req.payload.password)
+  const streetAddress = validators.isValidTextField(req.payload.streetAddress, true)
 
-  if (name && email && password && streetAddress) {
-    data.read('users', email, function (errRead, userData) {
+  if (name && email && password) {
+    data.read('users', email, (errRead, userData) => {
       if (errRead && !userData) {
         const hashedPassword = helpers.hash(password)
         if (hashedPassword) {
@@ -50,7 +51,7 @@ handlers.users.post = function (req, callback) {
             password: hashedPassword,
             streetAddress: streetAddress,
           }
-          data.create('users', email, objectUser, function (errCreate) {
+          data.create('users', email, objectUser, (errCreate) => {
             if (!errCreate) {
               delete objectUser.password
               callback(201, objectUser)
@@ -75,14 +76,14 @@ handlers.users.post = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.users.get = function (req, callback) {
+handlers._users.get = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const email = typeof req.queryStringObject.email === 'string' && req.queryStringObject.email.trim().length > 0 ? req.queryStringObject.email.trim() : false
+  const email = validators.isValidEmailField(req.queryStringObject.email)
   if (email) {
-    const token = typeof req.headers.token === 'string' ? req.headers.token : false
-    helpers.verifyToken(token, email, function (isValid) {
+    const token = validators.isValidTokenField(req.headers.token)
+    helpers.verifyToken(token, email, (isValid) => {
       if (isValid) {
-        data.read('users', email, function (errRead, userData) {
+        data.read('users', email, (errRead, userData) => {
           if (!errRead && userData) {
             delete userData.password
             callback(200, userData)
@@ -104,19 +105,19 @@ handlers.users.get = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.users.put = function (req, callback) {
+handlers._users.put = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const email = typeof req.queryStringObject.email === 'string' && req.queryStringObject.email.trim().length > 0 ? req.queryStringObject.email.trim() : false
-  const name = typeof req.payload.name === 'string' && req.payload.name.trim().length > 0 ? req.payload.name.trim() : false
-  const password = typeof req.payload.password === 'string' && req.payload.password.trim().length > 0 ? req.payload.password.trim() : false
-  const streetAddress = typeof req.payload.streetAddress === 'string' ? req.payload.streetAddress.trim() : false
+  const email = validators.isValidEmailField(req.queryStringObject.email)
+  const name = validators.isValidTextField(req.payload.name)
+  const password = validators.isValidPasswordField(req.payload.password)
+  const streetAddress = validators.isValidTextField(req.payload.streetAddress, true)
 
   if (email) {
-    const token = typeof req.headers.token === 'string' ? req.headers.token : false
-    helpers.verifyToken(token, email, function (isValid) {
+    const token = validators.isValidTokenField(req.headers.token)
+    helpers.verifyToken(token, email, (isValid) => {
       if (isValid) {
         if (name || password || streetAddress) {
-          data.read('users', email, function (errRead, userData) {
+          data.read('users', email, (errRead, userData) => {
             if (!errRead && userData) {
               if (name) {
                 userData.name = name
@@ -127,7 +128,7 @@ handlers.users.put = function (req, callback) {
               if (streetAddress) {
                 userData.streetAddress = streetAddress
               }
-              data.update('users', email, data, function (errUpdate) {
+              data.update('users', email, userData, (errUpdate) => {
                 if (!errUpdate) {
                   callback(200, { success: helpers.translate('success.user.updated', req.lang) })
                 } else {
@@ -142,11 +143,11 @@ handlers.users.put = function (req, callback) {
           callback(400, { error: helpers.translate('error.params.missing', req.lang) })
         }
       } else {
-        callback(401, { error: helpers.translate('error.token.invalid', data.lang) })
+        callback(401, { error: helpers.translate('error.token.invalid', req.lang) })
       }
     })
   } else {
-    callback(400, { error: helpers.translate('error.params.missing', data.lang) })
+    callback(400, { error: helpers.translate('error.params.missing', req.lang) })
   }
 }
 
@@ -155,28 +156,28 @@ handlers.users.put = function (req, callback) {
  * @param req
  * @param callback
  */
-handlers.users.delete = function (req, callback) {
+handlers._users.delete = (req, callback) => {
   // Validar los parámetros de la solicitud.
-  const email = typeof req.queryStringObject.email === 'string' && req.queryStringObject.email.trim().length > 0 ? req.queryStringObject.email.trim() : false
+  const email = validators.isValidEmailField(req.queryStringObject.email)
 
   if (email) {
-    const token = typeof req.headers.token === 'string' ? req.headers.token : false
-    helpers.verifyToken(token, email, function (isValid) {
+    const token = validators.isValidTokenField(req.headers.token)
+    helpers.verifyToken(token, email, (isValid) => {
       if (isValid) {
-        data.read('users', email, function (errRead, dataUser) {
+        data.read('users', email, (errRead, dataUser) => {
           if (!errRead && dataUser) {
-            data.delete('users', email, function (errDelete) {
+            data.delete('users', email, (errDelete) => {
               if (!errDelete) {
-                data.delete('tokens', token, function (errDeleteToken) {
+                data.delete('tokens', token, (errDeleteToken) => {
                   if (!errDeleteToken) {
-                    const userChecks = typeof dataUser.checks === 'object' && dataUser.checks instanceof Array && dataUser.checks.length > 0 ? dataUser.checks : []
+                    const userChecks = checkers.getValidArrayObject(dataUser.checks)
                     const checksToDelete = userChecks.length
                     if (checksToDelete > 0) {
                       let checksDeleted = 0
                       let deletionErrors = false
                       // Recorrer los checks
-                      userChecks.forEach(function (checkId) {
-                        data.delete('checks', checkId, function (err) {
+                      userChecks.forEach((checkId) => {
+                        data.delete('checks', checkId, (err) => {
                           if (err) {
                             deletionErrors = true
                           }
@@ -188,25 +189,25 @@ handlers.users.delete = function (req, callback) {
                         if (!deletionErrors) {
                           callback(204)
                         } else {
-                          callback(200, helpers.translate('error.user.check.deleted', data.lang))
+                          callback(200, helpers.translate('error.user.check.deleted', req.lang))
                         }
                       }
                     }
                     callback(204)
                   } else {
-                    callback(404, { error: helpers.translate('error.token.invalid', data.lang) })
+                    callback(404, { error: helpers.translate('error.token.invalid', req.lang) })
                   }
                 })
               } else {
-                callback(400, { error: helpers.translate('error.user.deleted', data.lang) })
+                callback(400, { error: helpers.translate('error.user.deleted', req.lang) })
               }
             })
           } else {
-            callback(404, { error: helpers.translate('error.user.not.found', data.lang) })
+            callback(404, { error: helpers.translate('error.user.not.found', req.lang) })
           }
         })
       } else {
-        callback(401, { error: helpers.translate('error.token.invalid', data.lang) })
+        callback(401, { error: helpers.translate('error.token.invalid', req.lang) })
       }
     })
   }
