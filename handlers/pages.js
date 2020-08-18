@@ -1,6 +1,6 @@
 /**
  * Homework 3
- * Crear una API Simple para mostrar un mensaje
+ * Controller para las páginas estáticas
  */
 
 // Dependencias libs
@@ -17,7 +17,7 @@ handlers.index = (req, callback) => {
   if (req.method !== 'get') {
     callback(405, undefined, 'html')
   } else {
-    helpers.getTemplate('index', (err, str) => {
+    helpers.getTemplate('pages/index', (err, str) => {
       if (!err && str) {
         callback(200, str, 'html')
       } else {
