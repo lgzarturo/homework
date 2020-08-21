@@ -17,9 +17,22 @@ handlers.index = (req, callback) => {
   if (req.method !== 'get') {
     callback(405, undefined, 'html')
   } else {
-    helpers.getTemplate('pages/index', (err, str) => {
+    const data = {
+      'head.title': 'Titulo del index',
+      'head.description': 'Aquí hay una descripción para el index',
+      'body.title': 'Pagina de inicio',
+      'body.class': 'index',
+    }
+
+    helpers.getTemplate('pages/index', data, (err, str) => {
       if (!err && str) {
-        callback(200, str, 'html')
+        helpers.applyLayout(str, data, (errLayout, content) => {
+          if (!errLayout && content) {
+            callback(200, content, 'html')
+          } else {
+            callback(500, undefined, 'html')
+          }
+        })
       } else {
         callback(404, undefined, 'html')
       }
