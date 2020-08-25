@@ -9,4 +9,8 @@ cleaners.getValidArrayObject = (value) => {
   return typeof value === 'object' && value instanceof Array && value.length > 0 ? value : []
 }
 
+cleaners.getValidObject = (value) => {
+  return typeof value === 'object' && value !== null ? value : {}
+}
+
 module.exports = cleaners
