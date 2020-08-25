@@ -78,7 +78,6 @@ handlers._shopping.post = (req, callback) => {
           if (!errRead && itemData) {
             const item = itemData[code]
             if (typeof item !== 'undefined') {
-              console.log({ item })
               const totalItem = quantity * item.price
               let totalItems = 0
               let quantityItems = 0

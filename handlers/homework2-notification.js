@@ -44,7 +44,6 @@ handlers._sms.get = (req, callback) => {
           if (!errTwilio) {
             callback(200, { success: helpers.translate('success.sent.sms', req.lang) })
           } else {
-            console.log({ errTwilio })
             callback(500, { error: helpers.translate('error.sent.sms', req.lang) })
           }
         })

@@ -37,10 +37,17 @@ handlers._users.post = (req, callback) => {
   // Validar los parámetros de la solicitud.
   const name = validators.isValidTextField(req.payload.name)
   const email = validators.isValidEmailField(req.payload.email)
+  const phone = validators.isValidTextField(req.payload.phone, true)
   const password = validators.isValidPasswordField(req.payload.password)
   const streetAddress = validators.isValidTextField(req.payload.streetAddress, true)
+  const tosAgreement = validators.isValidBooleanField(req.payload.tosAgreement)
 
-  if (name && email && password) {
+  if (tosAgreement === false) {
+    callback(409, { error: 'Debe aceptar los términos y condiciones del servicio' })
+    return
+  }
+
+  if (name && email && password && tosAgreement) {
     data.read('users', email, (errRead, userData) => {
       if (errRead && !userData) {
         const hashedPassword = helpers.hash(password)
@@ -48,8 +55,10 @@ handlers._users.post = (req, callback) => {
           const objectUser = {
             name: name,
             email: email,
+            phone: phone,
             password: hashedPassword,
             streetAddress: streetAddress,
+            tosAgreement: tosAgreement,
           }
           data.create('users', email, objectUser, (errCreate) => {
             if (!errCreate) {

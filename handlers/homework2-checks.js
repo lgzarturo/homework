@@ -104,7 +104,6 @@ handlers._checks.post = (req, callback) => {
 handlers._checks.get = (req, callback) => {
   // Validar los parámetros de la solicitud.
   const id = validators.isValidTextFieldSize(req.queryStringObject.id, 48)
-  console.log({ id })
   if (id) {
     data.read('checks', id, (err, checkData) => {
       if (!err && checkData) {
