@@ -40,4 +40,49 @@ handlers.index = (req, callback) => {
   }
 }
 
+handlers.favicon = (req, callback) => {
+  if (req.method !== 'get') {
+    callback(405, undefined, 'html')
+  } else {
+    helpers.getStaticAsset('favicon.ico', (err, data) => {
+      if (!err && data) {
+        callback(200, data, 'favicon')
+      } else {
+        callback(500)
+      }
+    })
+  }
+}
+
+handlers.public = (req, callback) => {
+  if (req.method !== 'get') {
+    callback(405, undefined, 'html')
+  } else {
+    const assetName = req.trimmedPath.replace('public/', '').trim()
+    if (assetName.length > 0) {
+      helpers.getStaticAsset(assetName, (err, data) => {
+        if (!err && data) {
+          let contentType = 'plain'
+          if (assetName.indexOf('.css') !== -1) {
+            contentType = 'css'
+          } else if (assetName.indexOf('.js') !== -1) {
+            contentType = 'js'
+          } else if (assetName.indexOf('.png') !== -1) {
+            contentType = 'png'
+          } else if (assetName.indexOf('.jpg') !== -1) {
+            contentType = 'jpg'
+          } else if (assetName.indexOf('.ico') !== -1) {
+            contentType = 'favicon'
+          }
+          callback(200, data, contentType)
+        } else {
+          callback(500)
+        }
+      })
+    } else {
+      callback(404)
+    }
+  }
+}
+
 module.exports = handlers
