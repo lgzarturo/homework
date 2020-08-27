@@ -1,0 +1,23 @@
+<h1>{body.title}</h1>
+<h2>{head.description}</h2>
+
+<div class="formWrapper">
+	<form id="sessionCreate" action="/api/tokens" method="POST">
+		<div class="formError"></div>
+		<div class="inputWrapper">
+			<div class="inputLabel">Email</div>
+			<label>
+				<input type="email" name="email" placeholder="email@domain.com" />
+			</label>
+		</div>
+		<div class="inputWrapper">
+			<div class="inputLabel">Your Password</div>
+			<label>
+				<input type="password" name="password" placeholder="*********" />
+			</label>
+		</div>
+		<div class="inputWrapper ctaWrapper">
+			<button type="submit" class="cta blue">Login</button>
+		</div>
+	</form>
+</div>

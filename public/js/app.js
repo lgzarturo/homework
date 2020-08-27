@@ -64,46 +64,145 @@ app.client.request = (headers, path, method, queryStringObject, payload, callbac
 }
 
 app.bindForms = () => {
-  document.querySelector('form').addEventListener('submit', function (e) {
-    e.preventDefault()
-    const formId = this.id
-    const path = this.action
-    const method = this.method.toUpperCase()
+  if (document.querySelector('form')) {
+    document.querySelector('form').addEventListener('submit', function (e) {
+      e.preventDefault()
+      const formId = this.id
+      const path = this.action
+      const method = this.method.toUpperCase()
 
-    document.querySelector(`#${formId} .formError`).style.display = 'hidden'
+      document.querySelector(`#${formId} .formError`).style.display = 'hidden'
 
-    const payload = {}
-    const { elements } = this
-    for (let index = 0; index < elements.length; index += 1) {
-      if (elements[index].type !== 'submit') {
-        const valueOfElement = elements[index].type === 'checkbox' ? elements[index].checked : elements[index].value
-        payload[elements[index].name] = valueOfElement
+      const payload = {}
+      const { elements } = this
+      for (let index = 0; index < elements.length; index += 1) {
+        if (elements[index].type !== 'submit') {
+          payload[elements[index].name] = elements[index].type === 'checkbox' ? elements[index].checked : elements[index].value
+        }
       }
-    }
 
-    app.client.request(undefined, path, method, undefined, payload, (statusCode, responsePayload) => {
-      if (statusCode >= 200 && statusCode <= 226) {
-        app.formResponseProcessor(formId, payload, responsePayload)
-        document.querySelector(`#${formId} .formError`).style.display = 'none'
-      } else {
-        const error = typeof responsePayload.error === 'string' ? responsePayload.error : 'Ha ocurrido un error, please try again'
-        document.querySelector(`#${formId} .formError`).innerHTML = error
-        document.querySelector(`#${formId} .formError`).style.display = 'block'
-      }
+      app.client.request(undefined, path, method, undefined, payload, (statusCode, responsePayload) => {
+        if (statusCode >= 200 && statusCode <= 226) {
+          app.formResponseProcessor(formId, payload, responsePayload)
+          document.querySelector(`#${formId} .formError`).style.display = 'none'
+        } else {
+          const error = typeof responsePayload.error === 'string' ? responsePayload.error : 'Ha ocurrido un error, please try again'
+          document.querySelector(`#${formId} .formError`).innerHTML = error
+          document.querySelector(`#${formId} .formError`).style.display = 'block'
+        }
+      })
     })
-  })
+  }
 }
 
 app.formResponseProcessor = (formId, requestPayload, responsePayload) => {
   const functionToCall = false
   if (formId === 'accountCreate') {
-    // @TODO Do something here now that the account has been created successfully
     console.log(`Procesando el formulario ${formId}`)
+    const newPayload = {
+      phone: requestPayload.phone,
+      password: requestPayload.password,
+    }
+
+    app.client.request(undefined, 'api/tokens', 'POST', undefined, newPayload, (newStatusCode, newResponsePayload) => {
+      if (newStatusCode !== 200) {
+        document.querySelector(`#${formId} .formError`).innerHTML = 'Ha ocurrido un error. Please try again.'
+        document.querySelector(`#${formId} .formError`).style.display = 'block'
+      } else {
+        app.setSessionToken(newResponsePayload)
+        window.location = '/checks/all'
+      }
+    })
   }
+
+  if (formId === 'sessionCreate') {
+    app.setSessionToken(responsePayload)
+    window.location = '/checks/all'
+  }
+}
+
+app.getSessionToken = () => {
+  const tokenString = localStorage.getItem('token')
+  if (typeof tokenString === 'string') {
+    try {
+      const token = JSON.parse(tokenString)
+      app.config.sessionToken = token
+      if (typeof token === 'object') {
+        app.setLoggedInClass(true)
+      } else {
+        app.setLoggedInClass(false)
+      }
+    } catch (e) {
+      app.config.sessionToken = false
+      app.setLoggedInClass(false)
+    }
+  }
+}
+
+app.setLoggedInClass = (add) => {
+  const target = document.querySelector('body')
+  if (add) {
+    target.classList.add('loggedIn')
+  } else {
+    target.classList.remove('loggedIn')
+  }
+}
+
+app.setSessionToken = (token) => {
+  app.config.sessionToken = token
+  const tokenString = JSON.stringify(token)
+  localStorage.setItem('token', tokenString)
+  if (typeof token === 'object') {
+    app.setLoggedInClass(true)
+  } else {
+    app.setLoggedInClass(false)
+  }
+}
+
+app.renewToken = (callback) => {
+  const currentToken = typeof app.config.sessionToken === 'object' ? app.config.sessionToken : false
+  if (currentToken) {
+    const payload = {
+      id: currentToken.id,
+      extend: true,
+    }
+    app.client.request(undefined, 'api/tokens', 'PUT', undefined, payload, (statusCode, responsePayload) => {
+      if (statusCode === 200) {
+        const queryStringObject = { id: currentToken.id }
+        app.client.request(undefined, 'api/tokens', 'GET', queryStringObject, undefined, (statusCode, responsePayload) => {
+          if (statusCode === 200) {
+            app.setSessionToken(responsePayload)
+            callback(false)
+          } else {
+            app.setSessionToken(false)
+            callback(true)
+          }
+        })
+      } else {
+        app.setSessionToken(false)
+        callback(true)
+      }
+    })
+  } else {
+    app.setSessionToken(false)
+    callback(true)
+  }
+}
+
+app.tokenRenewalLoop = () => {
+  setInterval(() => {
+    app.renewToken((err) => {
+      if (!err) {
+        console.log(`Se ha renovado el token @ ${Date.now()}`)
+      }
+    })
+  }, 1000 * 60)
 }
 
 app.init = () => {
   app.bindForms()
+  app.getSessionToken()
+  app.tokenRenewalLoop()
 }
 
 window.onload = () => {

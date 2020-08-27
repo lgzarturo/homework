@@ -1,5 +1,5 @@
 /**
- * Homework 3 - Controlador del CRUD Accounts
+ * Homework 3 - Controlador del CRUD Session
  */
 
 // Dependencias libs
@@ -8,7 +8,7 @@ const helpers = require('../lib/helpers')
 const handlers = {}
 
 /**
- * Accounts - post (URI: account/create)
+ * Accounts - post (URI: session/create)
  * @param req
  * @param callback
  */
@@ -17,13 +17,13 @@ handlers.create = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Create an Account',
-      'head.description': 'Registrate para poder usar el servicio.',
-      'body.title': 'Registra tu cuenta',
-      'body.class': 'accountCreate',
+      'head.title': 'Login to your account',
+      'head.description': 'Favor de ingresar los datos de acceso, para iniciar sesión.',
+      'body.title': 'Puerta de entrada al sistema',
+      'body.class': 'sessionCreate',
     }
 
-    helpers.getTemplate('accounts/create', data, (err, str) => {
+    helpers.getTemplate('sessions/create', data, (err, str) => {
       if (!err && str) {
         helpers.applyLayout(str, data, (errLayout, content) => {
           if (!errLayout && content) {
@@ -40,14 +40,14 @@ handlers.create = (req, callback) => {
 }
 
 /**
- * Accounts - post (URI: account/edit)
+ * Accounts - post (URI: session/edit)
  * @param req
  * @param callback
  */
 handlers.edit = (req, callback) => {}
 
 /**
- * Accounts - post (URI: account/delete)
+ * Accounts - post (URI: session/delete)
  * @param req
  * @param callback
  */
