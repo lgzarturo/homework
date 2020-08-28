@@ -35,7 +35,7 @@
 		<div class="inputWrapper">
 			<div class="inputLabel">Address</div>
 			<label>
-				<textarea class="displayAddressInput" name="address"></textarea>
+				<textarea class="displayAddressInput" name="streetAddress"></textarea>
 			</label>
 		</div>
 
@@ -63,4 +63,19 @@
 			<button type="submit" class="cta green">Save Password</button>
 		</div>
 	</form>
+</div>
+
+<div class="dangerZone">
+	<h2>Delete Your Account</h2>
+	<div class="formWrapper">
+		<form id="accountEdit3" action="/api/users" method="DELETE">
+			<input type="hidden" name="_method" value="DELETE"/>
+			<div class="formError"></div>
+			<div class="warning">Warning: This action cannot be undone. Dont click this button on accident!</div>
+			<input class="hiddenEmailInput" type="hidden" name="email" data-query="true" />
+			<div class="inputWrapper ctaWrapper">
+				<button type="submit" class="cta red">Delete Account</button>
+			</div>
+		</form>
+	</div>
 </div>

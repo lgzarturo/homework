@@ -101,6 +101,14 @@ h2 {
 	padding: 0 0 20px 0;
 }
 
+.dangerZone {
+	border: 2px solid #c83737;
+	border-radius: 4px;
+	padding: 20px;
+	margin: 30px auto;
+	background-color: #ffdada;
+}
+
 /*
 	CTA
  */
@@ -153,7 +161,7 @@ body.index .blurb {
 	color: #c83737;
 	font-size: 17px;
 	text-align: center;
-	line-height: 150px;
+	line-height: 150%;
 	padding: 0 0 20px 0;
 }
 

@@ -118,8 +118,6 @@ app.bindForms = () => {
           }
         }
 
-        console.log({ headers, queryStrings, payload })
-
         app.client.request(headers, path, method, queryStrings, payload, (statusCode, responsePayload) => {
           if (statusCode >= 200 && statusCode <= 226) {
             app.formResponseProcessor(formId, payload, responsePayload)
@@ -164,6 +162,11 @@ app.formResponseProcessor = (formId, requestPayload, responsePayload) => {
   const formsWithSuccessMessages = ['accountEdit1', 'accountEdit2']
   if (formsWithSuccessMessages.indexOf(formId) !== -1) {
     document.querySelector(`#${formId} .formSuccess`).style.display = 'block'
+  }
+
+  if (formId === 'accountEdit3') {
+    app.logUserOut(false)
+    window.location = '/account/deleted'
   }
 }
 
@@ -255,7 +258,7 @@ app.loadAccountEditPage = () => {
         document.querySelector('#accountEdit1 .fullNameInput').value = responsePayload.name
         document.querySelector('#accountEdit1 .emailInput').value = responsePayload.email
         document.querySelector('#accountEdit1 .displayPhoneInput').value = responsePayload.phone
-        document.querySelector('#accountEdit1 .displayAddressInput').value = responsePayload.address
+        document.querySelector('#accountEdit1 .displayAddressInput').value = responsePayload.streetAddress
 
         const hiddenPhoneInputs = document.querySelectorAll('input.hiddenEmailInput')
         for (let i = 0; i < hiddenPhoneInputs.length; i += 1) {
