@@ -41,7 +41,7 @@ app.client.request = (headers, path, method, queryStringObject, payload, callbac
   }
 
   if (app.config.sessionToken) {
-    xhr.setRequestHeader('token', app.config.sessionToken.id)
+    xhr.setRequestHeader('token', app.config.sessionToken.token)
   }
 
   xhr.onreadystatechange = () => {
@@ -71,7 +71,7 @@ app.bindLogoutButton = () => {
 }
 
 app.logUserOut = () => {
-  const tokenId = typeof app.config.sessionToken.id === 'string' ? app.config.sessionToken.id : false
+  const tokenId = typeof app.config.sessionToken.token === 'string' ? app.config.sessionToken.token : false
   const queryStringObject = {
     id: tokenId,
   }
@@ -83,33 +83,46 @@ app.logUserOut = () => {
 
 app.bindForms = () => {
   if (document.querySelector('form')) {
-    document.querySelector('form').addEventListener('submit', function (e) {
-      e.preventDefault()
-      const formId = this.id
-      const path = this.action
-      const method = this.method.toUpperCase()
+    const allForms = document.querySelectorAll('form')
+    for (let i = 0; i < allForms.length; i += 1) {
+      allForms[i].addEventListener('submit', function (e) {
+        e.preventDefault()
+        const formId = this.id
+        const path = this.action
+        let method = this.method.toUpperCase()
 
-      document.querySelector(`#${formId} .formError`).style.display = 'hidden'
-
-      const payload = {}
-      const { elements } = this
-      for (let index = 0; index < elements.length; index += 1) {
-        if (elements[index].type !== 'submit') {
-          payload[elements[index].name] = elements[index].type === 'checkbox' ? elements[index].checked : elements[index].value
+        document.querySelector(`#${formId} .formError`).style.display = 'none'
+        if (document.querySelector(`#${formId} .formSuccess`)) {
+          document.querySelector(`#${formId} .formSuccess`).style.display = 'none'
         }
-      }
 
-      app.client.request(undefined, path, method, undefined, payload, (statusCode, responsePayload) => {
-        if (statusCode >= 200 && statusCode <= 226) {
-          app.formResponseProcessor(formId, payload, responsePayload)
-          document.querySelector(`#${formId} .formError`).style.display = 'none'
-        } else {
-          const error = typeof responsePayload.error === 'string' ? responsePayload.error : 'Ha ocurrido un error, please try again'
-          document.querySelector(`#${formId} .formError`).innerHTML = error
-          document.querySelector(`#${formId} .formError`).style.display = 'block'
+        const payload = {}
+        const { elements } = this
+        for (let index = 0; index < elements.length; index += 1) {
+          if (elements[index].type !== 'submit') {
+            const value = elements[index].type === 'checkbox' ? elements[index].checked : elements[index].value
+            if (elements[index].name === '_method') {
+              method = value.toUpperCase()
+            } else {
+              payload[elements[index].name] = value
+            }
+          }
         }
+
+        app.client.request(undefined, path, method, undefined, payload, (statusCode, responsePayload) => {
+          console.log({ statusCode })
+          if (statusCode >= 200 && statusCode <= 226) {
+            app.formResponseProcessor(formId, payload, responsePayload)
+            document.querySelector(`#${formId} .formError`).style.display = 'none'
+          } else if (statusCode === 403) {
+            app.logUserOut()
+          } else {
+            document.querySelector(`#${formId} .formError`).innerHTML = typeof responsePayload.error === 'string' ? responsePayload.error : 'Ha ocurrido un error, please try again'
+            document.querySelector(`#${formId} .formError`).style.display = 'block'
+          }
+        })
       })
-    })
+    }
   }
 }
 
@@ -118,7 +131,7 @@ app.formResponseProcessor = (formId, requestPayload, responsePayload) => {
   if (formId === 'accountCreate') {
     console.log(`Procesando el formulario ${formId}`)
     const newPayload = {
-      phone: requestPayload.phone,
+      email: requestPayload.email,
       password: requestPayload.password,
     }
 
@@ -128,14 +141,19 @@ app.formResponseProcessor = (formId, requestPayload, responsePayload) => {
         document.querySelector(`#${formId} .formError`).style.display = 'block'
       } else {
         app.setSessionToken(newResponsePayload)
-        window.location = '/checks/all'
+        window.location = 'account/edit' // '/checks/all'
       }
     })
   }
 
   if (formId === 'sessionCreate') {
     app.setSessionToken(responsePayload)
-    window.location = '/checks/all'
+    window.location = 'account/edit' // '/checks/all'
+  }
+
+  const formsWithSuccessMessages = ['accountEdit1', 'accountEdit2']
+  if (formsWithSuccessMessages.indexOf(formId) !== -1) {
+    document.querySelector(`#${formId} .formSuccess`).style.display = 'block'
   }
 }
 
@@ -181,12 +199,12 @@ app.renewToken = (callback) => {
   const currentToken = typeof app.config.sessionToken === 'object' ? app.config.sessionToken : false
   if (currentToken) {
     const payload = {
-      id: currentToken.id,
+      token: currentToken.token,
       extend: true,
     }
     app.client.request(undefined, 'api/tokens', 'PUT', undefined, payload, (statusCode, responsePayload) => {
       if (statusCode === 200) {
-        const queryStringObject = { id: currentToken.id }
+        const queryStringObject = { token: currentToken.token }
         app.client.request(undefined, 'api/tokens', 'GET', queryStringObject, undefined, (statusCode, responsePayload) => {
           if (statusCode === 200) {
             app.setSessionToken(responsePayload)
@@ -207,6 +225,41 @@ app.renewToken = (callback) => {
   }
 }
 
+app.loadDataOnPage = () => {
+  const bodyClasses = document.querySelector('body').classList
+  const primaryClass = typeof bodyClasses[0] === 'string' ? bodyClasses[0] : false
+  if (primaryClass === 'accountEdit') {
+    app.loadAccountEditPage()
+  }
+}
+
+app.loadAccountEditPage = () => {
+  const email = typeof app.config.sessionToken.email === 'string' ? app.config.sessionToken.email : false
+  if (email) {
+    const queryStringObject = {
+      email: email,
+    }
+    app.client.request(undefined, 'api/users', 'GET', queryStringObject, undefined, (statusCode, responsePayload) => {
+      console.log({ statusCode })
+      if (statusCode === 200) {
+        document.querySelector('#accountEdit1 .fullNameInput').value = responsePayload.name
+        document.querySelector('#accountEdit1 .emailInput').value = responsePayload.email
+        document.querySelector('#accountEdit1 .displayPhoneInput').value = responsePayload.phone
+        document.querySelector('#accountEdit1 .displayAddressInput').value = responsePayload.address
+
+        const hiddenPhoneInputs = document.querySelectorAll('input.hiddenEmailInput')
+        for (let i = 0; i < hiddenPhoneInputs.length; i += 1) {
+          hiddenPhoneInputs[i].value = responsePayload.email
+        }
+      } else {
+        app.logUserOut()
+      }
+    })
+  } else {
+    app.logUserOut()
+  }
+}
+
 app.tokenRenewalLoop = () => {
   setInterval(() => {
     app.renewToken((err) => {
@@ -222,6 +275,7 @@ app.init = () => {
   app.bindLogoutButton()
   app.getSessionToken()
   app.tokenRenewalLoop()
+  app.loadDataOnPage()
 }
 
 window.onload = () => {

@@ -44,7 +44,30 @@ handlers.create = (req, callback) => {
  * @param req
  * @param callback
  */
-handlers.edit = (req, callback) => {}
+handlers.edit = (req, callback) => {
+  if (req.method !== 'get') {
+    callback(405, undefined, 'html')
+  } else {
+    const data = {
+      'head.title': 'Account settings',
+      'body.class': 'accountEdit',
+    }
+
+    helpers.getTemplate('accounts/edit', data, (err, str) => {
+      if (!err && str) {
+        helpers.applyLayout(str, data, (errLayout, content) => {
+          if (!errLayout && content) {
+            callback(200, content, 'html')
+          } else {
+            callback(500, undefined, 'html')
+          }
+        })
+      } else {
+        callback(404, undefined, 'html')
+      }
+    })
+  }
+}
 
 /**
  * Accounts - post (URI: account/delete)
