@@ -9,7 +9,14 @@
 		<input type="hidden" name="_method" value="PUT"/>
 		<div class="formError"></div>
 		<div class="formSuccess">Your Changes Have Been Saved</div>
-		<input class="hiddenEmailInput" type="hidden" name="email" />
+		<input class="hiddenEmailInput" type="hidden" name="email" data-query="true" />
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Email</div>
+			<label>
+				<input class="disabled emailInput" type="email" name="displayEmail" placeholder="email@domain.com" disabled data-ignore="true" />
+			</label>
+		</div>
 
 		<div class="inputWrapper">
 			<div class="inputLabel">Full Name</div>
@@ -19,29 +26,18 @@
 		</div>
 
 		<div class="inputWrapper">
-			<div class="inputLabel">Email</div>
-			<label>
-				<input class="emailInput" type="email" name="email" placeholder="email@domain.com" />
-			</label>
-		</div>
-
-		<div class="inputWrapper">
 			<div class="inputLabel">Phone</div>
 			<label>
-				<input class="disabled displayPhoneInput" type="text" name="phone" disabled />
+				<input class="displayPhoneInput" type="text" name="phone" />
 			</label>
 		</div>
 
 		<div class="inputWrapper">
 			<div class="inputLabel">Address</div>
 			<label>
-				<textarea class="disabled displayAddressInput" name="address" disabled></textarea>
+				<textarea class="displayAddressInput" name="address"></textarea>
 			</label>
 		</div>
-
-		<p>
-			Recuerda que para usar nuestros servicios aceptaste los términos y condiciones.
-		</p>
 
 		<div class="inputWrapper ctaWrapper">
 			<button type="submit" class="cta green">Save Changes</button>
@@ -56,7 +52,7 @@
 		<input type="hidden" name="_method" value="PUT"/>
 		<div class="formError"></div>
 		<div class="formSuccess">Your New Password Has Been Saved</div>
-		<input class="hiddenEmailInput" type="hidden" name="email" />
+		<input class="hiddenEmailInput" type="hidden" name="email" data-query="true" />
 		<div class="inputWrapper">
 			<div class="inputLabel">Choose a New Password</div>
 			<label>

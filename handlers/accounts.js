@@ -49,7 +49,8 @@ handlers.edit = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Account settings',
+      'head.title': 'Edit your account settings',
+      'body.title': 'Account settings',
       'body.class': 'accountEdit',
     }
 

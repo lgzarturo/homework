@@ -216,10 +216,10 @@ hr {
 	border-style: solid;
 }
 
-input, select, option {
-	border-width: 1px;
-	border-radius: 2px;
-	padding: 7px 1%;
+input, select, option, textarea {
+	border: 2px solid #3e999f;
+	border-radius: 4px;
+	padding: 7px 2%;
 	width: 100%;
 }
 
@@ -229,7 +229,8 @@ input, select, option {
 	margin: 20px;
 }
 
-input.disabled {
+input.disabled, select.disabled, option.disabled, textarea.disabled {
+	color: #bfbfbf;
 	background-color: #efefef;
 }
 

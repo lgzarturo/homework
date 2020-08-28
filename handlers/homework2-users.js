@@ -122,6 +122,8 @@ handlers._users.put = (req, callback) => {
   const password = validators.isValidPasswordField(req.payload.password)
   const streetAddress = validators.isValidTextField(req.payload.streetAddress, true)
 
+  console.log({ email, name, password, streetAddress })
+
   if (email) {
     const token = validators.isValidTokenField(req.headers.token)
     helpers.verifyToken(token, email, (isValid) => {

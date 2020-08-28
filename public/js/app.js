@@ -97,20 +97,30 @@ app.bindForms = () => {
         }
 
         const payload = {}
+        const queryStrings = {}
+        const headers = {}
         const { elements } = this
         for (let index = 0; index < elements.length; index += 1) {
           if (elements[index].type !== 'submit') {
             const value = elements[index].type === 'checkbox' ? elements[index].checked : elements[index].value
-            if (elements[index].name === '_method') {
-              method = value.toUpperCase()
-            } else {
-              payload[elements[index].name] = value
+
+            if (!elements[index].hasAttribute('data-ignore')) {
+              if (elements[index].name === '_method') {
+                method = value.toUpperCase()
+              } else if (elements[index].hasAttribute('data-query')) {
+                queryStrings[elements[index].name] = value
+              } else if (elements[index].hasAttribute('data-header')) {
+                headers[elements[index].name] = value
+              } else {
+                payload[elements[index].name] = value
+              }
             }
           }
         }
 
-        app.client.request(undefined, path, method, undefined, payload, (statusCode, responsePayload) => {
-          console.log({ statusCode })
+        console.log({ headers, queryStrings, payload })
+
+        app.client.request(headers, path, method, queryStrings, payload, (statusCode, responsePayload) => {
           if (statusCode >= 200 && statusCode <= 226) {
             app.formResponseProcessor(formId, payload, responsePayload)
             document.querySelector(`#${formId} .formError`).style.display = 'none'
