@@ -131,7 +131,9 @@ app.bindForms = () => {
           if (statusCode >= 200 && statusCode <= 226) {
             app.formResponseProcessor(formId, payload, responsePayload)
             document.querySelector(`#${formId} .formError`).style.display = 'none'
-            document.querySelector(`#${formId} .formSuccess`).style.display = 'block'
+            if (document.querySelector(`#${formId} .formSuccess`)) {
+              document.querySelector(`#${formId} .formSuccess`).style.display = 'block'
+            }
           } else if (statusCode === 403) {
             app.logUserOut()
           } else {
