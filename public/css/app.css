@@ -255,7 +255,7 @@ input.disabled, select.disabled, option.disabled, textarea.disabled {
 	text-transform: uppercase;
 	font-weight: bold !important;
 	display: inline-block !important;
-	width: 100%;
+	width: 100px;
 	padding: 7px !important;
 	color: #fff !important;
 	background-color: #1a1a1a;

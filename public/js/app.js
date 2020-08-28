@@ -98,27 +98,34 @@ app.bindForms = () => {
 
         const payload = {}
         const queryStrings = {}
-        const headers = {}
         const { elements } = this
         for (let index = 0; index < elements.length; index += 1) {
           if (elements[index].type !== 'submit') {
             const value = elements[index].type === 'checkbox' ? elements[index].checked : elements[index].value
+            const classOfElement = typeof elements[index].classList.value === 'string' && elements[index].classList.value.length > 0 ? elements[index].classList.value : ''
+            const elementIsChecked = elements[index].checked
+            const nameOfElement = elements[index].name
 
             if (!elements[index].hasAttribute('data-ignore')) {
-              if (elements[index].name === '_method') {
+              if (nameOfElement === '_method') {
                 method = value.toUpperCase()
               } else if (elements[index].hasAttribute('data-query')) {
-                queryStrings[elements[index].name] = value
-              } else if (elements[index].hasAttribute('data-header')) {
-                headers[elements[index].name] = value
+                queryStrings[nameOfElement] = value
+              } else if (classOfElement.indexOf('multiselect') !== -1) {
+                if (elementIsChecked) {
+                  payload[nameOfElement] = typeof payload[nameOfElement] === 'object' && payload[nameOfElement] instanceof Array ? payload[nameOfElement] : []
+                  payload[nameOfElement].push(parseInt(elements[index].value))
+                }
+              } else if (classOfElement.indexOf('intval') !== -1) {
+                payload[nameOfElement] = parseInt(value)
               } else {
-                payload[elements[index].name] = value
+                payload[nameOfElement] = value
               }
             }
           }
         }
 
-        app.client.request(headers, path, method, queryStrings, payload, (statusCode, responsePayload) => {
+        app.client.request(undefined, path, method, queryStrings, payload, (statusCode, responsePayload) => {
           if (statusCode >= 200 && statusCode <= 226) {
             app.formResponseProcessor(formId, payload, responsePayload)
             document.querySelector(`#${formId} .formError`).style.display = 'none'
@@ -167,6 +174,10 @@ app.formResponseProcessor = (formId, requestPayload, responsePayload) => {
   if (formId === 'accountEdit3') {
     app.logUserOut(false)
     window.location = '/account/deleted'
+  }
+
+  if (formId === 'checksCreate') {
+    window.location = '/checks/all'
   }
 }
 
