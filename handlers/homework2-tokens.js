@@ -35,6 +35,8 @@ handlers._tokens.post = (req, callback) => {
   const email = validators.isValidEmailField(req.payload.email)
   const password = validators.isValidPasswordField(req.payload.password)
 
+  console.log({ email, password })
+
   if (email && password) {
     data.read('users', email, (errRead, user) => {
       if (!errRead && user) {

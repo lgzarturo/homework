@@ -90,6 +90,7 @@ handlers._users.get = (req, callback) => {
   const email = validators.isValidEmailField(req.queryStringObject.email)
   if (email) {
     const token = validators.isValidTokenField(req.headers.token)
+    console.log({ token })
     helpers.verifyToken(token, email, (isValid) => {
       if (isValid) {
         data.read('users', email, (errRead, userData) => {
@@ -120,6 +121,8 @@ handlers._users.put = (req, callback) => {
   const name = validators.isValidTextField(req.payload.name)
   const password = validators.isValidPasswordField(req.payload.password)
   const streetAddress = validators.isValidTextField(req.payload.streetAddress, true)
+
+  console.log({ email, name, password, streetAddress })
 
   if (email) {
     const token = validators.isValidTokenField(req.headers.token)
