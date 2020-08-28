@@ -8,7 +8,7 @@ const helpers = require('../lib/helpers')
 const handlers = {}
 
 /**
- * Accounts - post (URI: session/create)
+ * Sessions - post (URI: session/create)
  * @param req
  * @param callback
  */
@@ -40,17 +40,42 @@ handlers.create = (req, callback) => {
 }
 
 /**
- * Accounts - post (URI: session/edit)
+ * Sessions - post (URI: session/edit)
  * @param req
  * @param callback
  */
 handlers.edit = (req, callback) => {}
 
 /**
- * Accounts - post (URI: session/delete)
+ * Sessions - post (URI: session/delete)
  * @param req
  * @param callback
  */
-handlers.delete = (req, callback) => {}
+handlers.delete = (req, callback) => {
+  if (req.method !== 'get') {
+    callback(405, undefined, 'html')
+  } else {
+    const data = {
+      'head.title': 'Logout',
+      'head.description': 'La sesión ha terminado.',
+      'body.title': 'Gracias por usar el sistema',
+      'body.class': 'sessionDeleted',
+    }
+
+    helpers.getTemplate('sessions/delete', data, (err, str) => {
+      if (!err && str) {
+        helpers.applyLayout(str, data, (errLayout, content) => {
+          if (!errLayout && content) {
+            callback(200, content, 'html')
+          } else {
+            callback(500, undefined, 'html')
+          }
+        })
+      } else {
+        callback(404, undefined, 'html')
+      }
+    })
+  }
+}
 
 module.exports = handlers

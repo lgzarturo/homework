@@ -63,6 +63,24 @@ app.client.request = (headers, path, method, queryStringObject, payload, callbac
   xhr.send(payloadString)
 }
 
+app.bindLogoutButton = () => {
+  document.getElementById('logoutButton').addEventListener('click', function (e) {
+    e.preventDefault()
+    app.logUserOut()
+  })
+}
+
+app.logUserOut = () => {
+  const tokenId = typeof app.config.sessionToken.id === 'string' ? app.config.sessionToken.id : false
+  const queryStringObject = {
+    id: tokenId,
+  }
+  app.client.request(undefined, 'api/tokens', 'DELETE', queryStringObject, undefined, (statusCode, responsePayload) => {
+    app.setSessionToken(false)
+    window.location = '/session/delete'
+  })
+}
+
 app.bindForms = () => {
   if (document.querySelector('form')) {
     document.querySelector('form').addEventListener('submit', function (e) {
@@ -201,6 +219,7 @@ app.tokenRenewalLoop = () => {
 
 app.init = () => {
   app.bindForms()
+  app.bindLogoutButton()
   app.getSessionToken()
   app.tokenRenewalLoop()
 }
