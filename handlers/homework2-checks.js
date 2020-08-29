@@ -35,12 +35,13 @@ handlers._checks.post = (req, callback) => {
   // Validar los parámetros de la solicitud
   const protocol = validators.isValidProtocolValue(req.payload.protocol)
   const url = validators.isValidTextField(req.payload.url)
-  const method = validators.isValidMethodValue(req.payload.method)
+  const method = validators.isValidMethodValue(req.payload.httpmethod)
   const successCodes = validators.isValidArrayObject(req.payload.successCodes)
   const timeoutSeconds = validators.isValidTimeInSeconds(req.payload.timeoutSeconds)
 
   if (protocol && url && method && successCodes && timeoutSeconds) {
     const token = validators.isValidTokenField(req.headers.token)
+
     if (token) {
       data.read('tokens', token, (errRead, tokenData) => {
         if (!errRead && tokenData) {
@@ -88,6 +89,8 @@ handlers._checks.post = (req, callback) => {
           callback(403)
         }
       })
+    } else {
+      callback(403, { error: 'No tiene permisos para continuar' })
     }
   } else {
     callback(400, {

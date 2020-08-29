@@ -98,30 +98,42 @@ app.bindForms = () => {
 
         const payload = {}
         const queryStrings = {}
-        const headers = {}
         const { elements } = this
         for (let index = 0; index < elements.length; index += 1) {
           if (elements[index].type !== 'submit') {
             const value = elements[index].type === 'checkbox' ? elements[index].checked : elements[index].value
+            const classOfElement = typeof elements[index].classList.value === 'string' && elements[index].classList.value.length > 0 ? elements[index].classList.value : ''
+            const elementIsChecked = elements[index].checked
+            const nameOfElement = elements[index].name
 
             if (!elements[index].hasAttribute('data-ignore')) {
-              if (elements[index].name === '_method') {
+              if (nameOfElement === '_method') {
                 method = value.toUpperCase()
+              } else if (nameOfElement === '_id') {
+                queryStrings.id = value
               } else if (elements[index].hasAttribute('data-query')) {
-                queryStrings[elements[index].name] = value
-              } else if (elements[index].hasAttribute('data-header')) {
-                headers[elements[index].name] = value
+                queryStrings[nameOfElement] = value
+              } else if (classOfElement.indexOf('multiselect') !== -1) {
+                if (elementIsChecked) {
+                  payload[nameOfElement] = typeof payload[nameOfElement] === 'object' && payload[nameOfElement] instanceof Array ? payload[nameOfElement] : []
+                  payload[nameOfElement].push(parseInt(elements[index].value))
+                }
+              } else if (classOfElement.indexOf('intval') !== -1) {
+                payload[nameOfElement] = parseInt(value)
               } else {
-                payload[elements[index].name] = value
+                payload[nameOfElement] = value
               }
             }
           }
         }
 
-        app.client.request(headers, path, method, queryStrings, payload, (statusCode, responsePayload) => {
+        app.client.request(undefined, path, method, queryStrings, payload, (statusCode, responsePayload) => {
           if (statusCode >= 200 && statusCode <= 226) {
             app.formResponseProcessor(formId, payload, responsePayload)
             document.querySelector(`#${formId} .formError`).style.display = 'none'
+            if (document.querySelector(`#${formId} .formSuccess`)) {
+              document.querySelector(`#${formId} .formSuccess`).style.display = 'block'
+            }
           } else if (statusCode === 403) {
             app.logUserOut()
           } else {
@@ -167,6 +179,10 @@ app.formResponseProcessor = (formId, requestPayload, responsePayload) => {
   if (formId === 'accountEdit3') {
     app.logUserOut(false)
     window.location = '/account/deleted'
+  }
+
+  if (formId === 'checksCreate') {
+    window.location = '/checks/all'
   }
 }
 
@@ -244,6 +260,12 @@ app.loadDataOnPage = () => {
   if (primaryClass === 'accountEdit') {
     app.loadAccountEditPage()
   }
+  if (primaryClass === 'checkList') {
+    app.loadChecksListPage()
+  }
+  if (primaryClass === 'checkEdit') {
+    app.loadChecksEditPage()
+  }
 }
 
 app.loadAccountEditPage = () => {
@@ -270,6 +292,94 @@ app.loadAccountEditPage = () => {
     })
   } else {
     app.logUserOut()
+  }
+}
+
+app.loadChecksListPage = function () {
+  const email = typeof app.config.sessionToken.email === 'string' ? app.config.sessionToken.email : false
+  if (email) {
+    const queryStringObject = {
+      email: email,
+    }
+    app.client.request(undefined, 'api/users', 'GET', queryStringObject, undefined, function (statusCode, responsePayload) {
+      if (statusCode === 200) {
+        const allChecks = typeof responsePayload.checks === 'object' && responsePayload.checks instanceof Array && responsePayload.checks.length > 0 ? responsePayload.checks : []
+        if (allChecks.length > 0) {
+          allChecks.forEach(function (checkId) {
+            const newQueryStringObject = {
+              id: checkId,
+            }
+            app.client.request(undefined, 'api/checks', 'GET', newQueryStringObject, undefined, function (statusCode, responsePayload) {
+              if (statusCode === 200) {
+                const checkData = responsePayload
+                const table = document.getElementById('checksListTable')
+                const tr = table.insertRow(-1)
+                tr.classList.add('checkRow')
+                const td0 = tr.insertCell(0)
+                const td1 = tr.insertCell(1)
+                const td2 = tr.insertCell(2)
+                const td3 = tr.insertCell(3)
+                const td4 = tr.insertCell(4)
+                td0.innerHTML = responsePayload.method.toUpperCase()
+                td1.innerHTML = `${responsePayload.protocol}://`
+                td2.innerHTML = responsePayload.url
+                const state = typeof responsePayload.state === 'string' ? responsePayload.state : 'unknown'
+                td3.innerHTML = state
+                td4.innerHTML = `<a href="/checks/edit?id=${responsePayload.id}">View / Edit / Delete</a>`
+              } else {
+                console.log('Error trying to load check ID: ', checkId)
+              }
+            })
+          })
+
+          if (allChecks.length < 5) {
+            document.getElementById('createCheckCTA').style.display = 'block'
+          }
+        } else {
+          document.getElementById('noChecksMessage').style.display = 'table-row'
+          document.getElementById('createCheckCTA').style.display = 'block'
+        }
+      } else {
+        app.logUserOut()
+      }
+    })
+  } else {
+    app.logUserOut()
+  }
+}
+
+app.loadChecksEditPage = function () {
+  const id = typeof window.location.href.split('=')[1] === 'string' && window.location.href.split('=')[1].length > 0 ? window.location.href.split('=')[1] : false
+  if (id) {
+    const queryStringObject = {
+      id: id,
+    }
+    app.client.request(undefined, 'api/checks', 'GET', queryStringObject, undefined, function (statusCode, responsePayload) {
+      if (statusCode === 200) {
+        console.log({ statusCode, id })
+        const hiddenIdInputs = document.querySelectorAll('input.hiddenIdInput')
+        for (let i = 0; i < hiddenIdInputs.length; i += 1) {
+          hiddenIdInputs[i].value = responsePayload.id
+        }
+
+        document.querySelector('#checksEdit1 .displayIdInput').value = responsePayload.id
+        document.querySelector('#checksEdit1 .displayStateInput').value = responsePayload.state
+        document.querySelector('#checksEdit1 .protocolInput').value = responsePayload.protocol
+        document.querySelector('#checksEdit1 .urlInput').value = responsePayload.url
+        document.querySelector('#checksEdit1 .methodInput').value = responsePayload.method
+        document.querySelector('#checksEdit1 .timeoutInput').value = responsePayload.timeoutSeconds
+        const successCodeCheckboxes = document.querySelectorAll('#checksEdit1 input.successCodesInput')
+        for (let i = 0; i < successCodeCheckboxes.length; i += 1) {
+          if (responsePayload.successCodes.indexOf(parseInt(successCodeCheckboxes[i].value)) !== -1) {
+            successCodeCheckboxes[i].checked = true
+          }
+        }
+      } else {
+        window.location = '/checks/all'
+      }
+    })
+  } else {
+    window.location = '/checks/all'
   }
 }
 
