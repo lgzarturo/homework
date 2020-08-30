@@ -17,9 +17,9 @@ handlers.create = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Create an Account',
-      'head.description': 'Registrate para poder usar el servicio.',
-      'body.title': 'Registra tu cuenta',
+      'head.title': helpers.translate('account.create.page.title', req.lang),
+      'head.description': helpers.translate('account.create.page.description', req.lang),
+      'body.title': helpers.translate('account.create.title', req.lang),
       'body.class': 'accountCreate',
     }
 
@@ -49,8 +49,8 @@ handlers.edit = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Edit your account settings',
-      'body.title': 'Account settings',
+      'head.title': helpers.translate('account.edit.page.title', req.lang),
+      'body.title': helpers.translate('account.edit.title', req.lang),
       'body.class': 'accountEdit',
     }
 
@@ -80,8 +80,8 @@ handlers.delete = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Danger zone',
-      'body.title': 'Your account ha been deleted',
+      'head.title': helpers.translate('account.delete.page.title', req.lang),
+      'body.title': helpers.translate('account.delete.title', req.lang),
       'body.class': 'accountDeleted',
     }
 

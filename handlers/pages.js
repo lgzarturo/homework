@@ -18,9 +18,9 @@ handlers.index = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Uptime monitoring - Devops made simple',
-      'head.description': 'Revisa la disponibilidad de todos tus sitios web, te enviaremos un mensaje si alguno presenta fallos',
-      'body.title': 'HTTP/HTTPS Website monitoring',
+      'head.title': helpers.translate('pages.index.page.title', req.lang),
+      'head.description': helpers.translate('pages.index.page.description', req.lang),
+      'body.title': helpers.translate('pages.index.title', req.lang),
       'body.class': 'index',
     }
 

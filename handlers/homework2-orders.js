@@ -149,6 +149,7 @@ handlers._payments.post = (req, callback) => {
                     }
                   })
 
+                  // eslint-disable-next-line no-param-reassign
                   delete userData.password
 
                   const payment = {

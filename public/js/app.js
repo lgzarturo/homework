@@ -11,17 +11,24 @@ app.config = {
 app.client = {}
 
 app.client.request = (headers, path, method, queryStringObject, payload, callback) => {
+  // eslint-disable-next-line no-param-reassign
   headers = typeof headers === 'object' && headers !== null ? headers : {}
+  // eslint-disable-next-line no-param-reassign
   path = typeof path === 'string' ? path : '/'
+  // eslint-disable-next-line no-param-reassign
   method = typeof method === 'string' && ['POST', 'GET', 'PUT', 'DELETE'].indexOf(method) !== -1 ? method.toLowerCase() : 'GET'
+  // eslint-disable-next-line no-param-reassign
   queryStringObject = typeof queryStringObject === 'object' && queryStringObject !== null ? queryStringObject : {}
+  // eslint-disable-next-line no-param-reassign
   payload = typeof payload === 'object' && payload !== null ? payload : {}
+  // eslint-disable-next-line no-param-reassign
   callback = typeof callback === 'function' ? callback : false
 
   let requestUrl = `${path}?`
   let counter = 0
+  // eslint-disable-next-line no-restricted-syntax
   for (const queryKey in queryStringObject) {
-    if (queryStringObject.hasOwnProperty(queryKey)) {
+    if (Object.prototype.hasOwnProperty.call(queryStringObject, queryKey)) {
       counter += 1
       if (counter > 1) {
         requestUrl = `${requestUrl}&`
@@ -34,8 +41,9 @@ app.client.request = (headers, path, method, queryStringObject, payload, callbac
   xhr.open(method, requestUrl, true)
   xhr.setRequestHeader('content-type', 'application/json')
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const headerKey in headers) {
-    if (headers.hasOwnProperty(headerKey)) {
+    if (Object.prototype.hasOwnProperty.call(headers, headerKey)) {
       xhr.setRequestHeader(headerKey, headers[headerKey])
     }
   }
@@ -76,6 +84,7 @@ app.logUserOut = () => {
     id: tokenId,
   }
   app.client.request(undefined, 'api/tokens', 'DELETE', queryStringObject, undefined, (statusCode, responsePayload) => {
+    console.log({ statusCode, responsePayload })
     app.setSessionToken(false)
     window.location = '/session/delete'
   })
@@ -116,10 +125,10 @@ app.bindForms = () => {
               } else if (classOfElement.indexOf('multiselect') !== -1) {
                 if (elementIsChecked) {
                   payload[nameOfElement] = typeof payload[nameOfElement] === 'object' && payload[nameOfElement] instanceof Array ? payload[nameOfElement] : []
-                  payload[nameOfElement].push(parseInt(elements[index].value))
+                  payload[nameOfElement].push(parseInt(elements[index].value, 10))
                 }
               } else if (classOfElement.indexOf('intval') !== -1) {
-                payload[nameOfElement] = parseInt(value)
+                payload[nameOfElement] = parseInt(value, 10)
               } else {
                 payload[nameOfElement] = value
               }
@@ -147,7 +156,6 @@ app.bindForms = () => {
 }
 
 app.formResponseProcessor = (formId, requestPayload, responsePayload) => {
-  const functionToCall = false
   if (formId === 'accountCreate') {
     console.log(`Procesando el formulario ${formId}`)
     const newPayload = {
@@ -231,8 +239,9 @@ app.renewToken = (callback) => {
       token: currentToken.token,
       extend: true,
     }
-    app.client.request(undefined, 'api/tokens', 'PUT', undefined, payload, (statusCode, responsePayload) => {
-      if (statusCode === 200) {
+    app.client.request(undefined, 'api/tokens', 'PUT', undefined, payload, (statusCodeToken, response) => {
+      console.log({ response })
+      if (statusCodeToken === 200) {
         const queryStringObject = { token: currentToken.token }
         app.client.request(undefined, 'api/tokens', 'GET', queryStringObject, undefined, (statusCode, responsePayload) => {
           if (statusCode === 200) {
@@ -309,9 +318,8 @@ app.loadChecksListPage = function () {
             const newQueryStringObject = {
               id: checkId,
             }
-            app.client.request(undefined, 'api/checks', 'GET', newQueryStringObject, undefined, function (statusCode, responsePayload) {
-              if (statusCode === 200) {
-                const checkData = responsePayload
+            app.client.request(undefined, 'api/checks', 'GET', newQueryStringObject, undefined, function (statusCodeCheck, responsePayloadCheck) {
+              if (statusCodeCheck === 200) {
                 const table = document.getElementById('checksListTable')
                 const tr = table.insertRow(-1)
                 tr.classList.add('checkRow')
@@ -320,12 +328,11 @@ app.loadChecksListPage = function () {
                 const td2 = tr.insertCell(2)
                 const td3 = tr.insertCell(3)
                 const td4 = tr.insertCell(4)
-                td0.innerHTML = responsePayload.method.toUpperCase()
-                td1.innerHTML = `${responsePayload.protocol}://`
-                td2.innerHTML = responsePayload.url
-                const state = typeof responsePayload.state === 'string' ? responsePayload.state : 'unknown'
-                td3.innerHTML = state
-                td4.innerHTML = `<a href="/checks/edit?id=${responsePayload.id}">View / Edit / Delete</a>`
+                td0.innerHTML = responsePayloadCheck.method.toUpperCase()
+                td1.innerHTML = `${responsePayloadCheck.protocol}://`
+                td2.innerHTML = responsePayloadCheck.url
+                td3.innerHTML = typeof responsePayloadCheck.state === 'string' ? responsePayloadCheck.state : 'unknown'
+                td4.innerHTML = `<a href="/checks/edit?id=${responsePayloadCheck.id}">View / Edit / Delete</a>`
               } else {
                 console.log('Error trying to load check ID: ', checkId)
               }
@@ -370,7 +377,7 @@ app.loadChecksEditPage = function () {
         document.querySelector('#checksEdit1 .timeoutInput').value = responsePayload.timeoutSeconds
         const successCodeCheckboxes = document.querySelectorAll('#checksEdit1 input.successCodesInput')
         for (let i = 0; i < successCodeCheckboxes.length; i += 1) {
-          if (responsePayload.successCodes.indexOf(parseInt(successCodeCheckboxes[i].value)) !== -1) {
+          if (responsePayload.successCodes.indexOf(parseInt(successCodeCheckboxes[i].value, 10)) !== -1) {
             successCodeCheckboxes[i].checked = true
           }
         }

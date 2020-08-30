@@ -107,6 +107,7 @@ handlers._tokens.put = (req, callback) => {
     data.read('tokens', token, (err, dataToken) => {
       if (!err && dataToken) {
         if (dataToken.expires > Date.now()) {
+          // eslint-disable-next-line no-param-reassign
           dataToken.expires = Date.now() + config.tokenDuration
           data.update('tokens', token, dataToken, (errUpdate) => {
             if (!errUpdate) {

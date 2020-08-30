@@ -65,6 +65,7 @@ handlers._checks.post = (req, callback) => {
                 data.create('checks', checkId, checkObject, (errCreate) => {
                   if (!errCreate) {
                     // Agregar el check al usuario
+                    // eslint-disable-next-line no-param-reassign
                     userData.checks = userChecks
                     userData.checks.push(checkId)
                     data.update('users', userEmail, userData, (errUpdate) => {
@@ -90,7 +91,7 @@ handlers._checks.post = (req, callback) => {
         }
       })
     } else {
-      callback(403, { error: 'No tiene permisos para continuar' })
+      callback(403, { error: helpers.translate('error.user.forbidden.permissions', req.lang) })
     }
   } else {
     callback(400, {
@@ -149,18 +150,23 @@ handlers._checks.put = (req, callback) => {
           helpers.verifyToken(token, checkData.userEmail, (isValid) => {
             if (isValid) {
               if (protocol) {
+                // eslint-disable-next-line no-param-reassign
                 checkData.protocol = protocol
               }
               if (url) {
+                // eslint-disable-next-line no-param-reassign
                 checkData.url = url
               }
               if (method) {
+                // eslint-disable-next-line no-param-reassign
                 checkData.method = method
               }
               if (successCodes) {
+                // eslint-disable-next-line no-param-reassign
                 checkData.successCodes = successCodes
               }
               if (timeoutSeconds) {
+                // eslint-disable-next-line no-param-reassign
                 checkData.timeoutSeconds = timeoutSeconds
               }
               data.update('checks', id, checkData, (err) => {

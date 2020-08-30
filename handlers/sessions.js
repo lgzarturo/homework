@@ -17,9 +17,9 @@ handlers.create = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Login to your account',
-      'head.description': 'Favor de ingresar los datos de acceso, para iniciar sesión.',
-      'body.title': 'Puerta de entrada al sistema',
+      'head.title': helpers.translate('session.create.page.title', req.lang),
+      'head.description': helpers.translate('session.create.page.description', req.lang),
+      'body.title': helpers.translate('session.create.title', req.lang),
       'body.class': 'sessionCreate',
     }
 
@@ -44,7 +44,9 @@ handlers.create = (req, callback) => {
  * @param req
  * @param callback
  */
-handlers.edit = (req, callback) => {}
+handlers.edit = (req, callback) => {
+  console.log({ req, callback })
+}
 
 /**
  * Sessions - post (URI: session/delete)
@@ -56,9 +58,9 @@ handlers.delete = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Logout',
-      'head.description': 'La sesión ha terminado.',
-      'body.title': 'Gracias por usar el sistema',
+      'head.title': helpers.translate('session.delete.page.title', req.lang),
+      'head.description': helpers.translate('session.delete.page.description', req.lang),
+      'body.title': helpers.translate('session.delete.title', req.lang),
       'body.class': 'sessionDeleted',
     }
 

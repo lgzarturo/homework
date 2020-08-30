@@ -17,8 +17,8 @@ handlers.list = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Dashboard',
-      'body.title': 'Web site checkers',
+      'head.title': helpers.translate('check.list.page.title', req.lang),
+      'body.title': helpers.translate('check.list.title', req.lang),
       'body.class': 'checkList',
     }
 
@@ -48,8 +48,8 @@ handlers.create = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Create a new check',
-      'body.title': 'Web site check',
+      'head.title': helpers.translate('check.create.page.title', req.lang),
+      'body.title': helpers.translate('check.create.title', req.lang),
       'body.class': 'checkCreate',
     }
 
@@ -79,8 +79,8 @@ handlers.edit = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Check details',
-      'body.title': 'Checks edit',
+      'head.title': helpers.translate('check.edit.page.title', req.lang),
+      'body.title': helpers.translate('check.edit.title', req.lang),
       'body.class': 'checkEdit',
     }
 
@@ -110,9 +110,9 @@ handlers.delete = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': 'Logout',
-      'head.description': 'La sesión ha terminado.',
-      'body.title': 'Gracias por usar el sistema',
+      'head.title': helpers.translate('check.delete.page.title', req.lang),
+      'head.description': helpers.translate('check.delete.page.description', req.lang),
+      'body.title': helpers.translate('check.delete.title', req.lang),
       'body.class': 'checkDeleted',
     }
 

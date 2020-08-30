@@ -43,7 +43,7 @@ handlers._users.post = (req, callback) => {
   const tosAgreement = validators.isValidBooleanField(req.payload.tosAgreement)
 
   if (tosAgreement === false) {
-    callback(409, { error: 'Debe aceptar los términos y condiciones del servicio' })
+    callback(409, { error: helpers.translate('error.terms.and.policy', req.lang) })
     return
   }
 
@@ -95,6 +95,7 @@ handlers._users.get = (req, callback) => {
       if (isValid) {
         data.read('users', email, (errRead, userData) => {
           if (!errRead && userData) {
+            // eslint-disable-next-line no-param-reassign
             delete userData.password
             callback(200, userData)
           } else {
@@ -132,12 +133,15 @@ handlers._users.put = (req, callback) => {
           data.read('users', email, (errRead, userData) => {
             if (!errRead && userData) {
               if (name) {
+                // eslint-disable-next-line no-param-reassign
                 userData.name = name
               }
               if (password) {
+                // eslint-disable-next-line no-param-reassign
                 userData.password = helpers.hash(password)
               }
               if (streetAddress) {
+                // eslint-disable-next-line no-param-reassign
                 userData.streetAddress = streetAddress
               }
               data.update('users', email, userData, (errUpdate) => {
