@@ -50,6 +50,9 @@ app.client.request = (headers, path, method, queryStringObject, payload, callbac
 
   if (app.config.sessionToken) {
     xhr.setRequestHeader('token', app.config.sessionToken.token)
+    if (app.config.sessionToken.email !== undefined) {
+      xhr.setRequestHeader('email', app.config.sessionToken.email)
+    }
   }
 
   xhr.onreadystatechange = () => {
@@ -169,14 +172,14 @@ app.formResponseProcessor = (formId, requestPayload, responsePayload) => {
         document.querySelector(`#${formId} .formError`).style.display = 'block'
       } else {
         app.setSessionToken(newResponsePayload)
-        window.location = 'account/edit' // '/checks/all'
+        window.location = '/checks/all'
       }
     })
   }
 
   if (formId === 'sessionCreate') {
     app.setSessionToken(responsePayload)
-    window.location = 'account/edit' // '/checks/all'
+    window.location = '/checks/all'
   }
 
   const formsWithSuccessMessages = ['accountEdit1', 'accountEdit2']
@@ -275,6 +278,9 @@ app.loadDataOnPage = () => {
   if (primaryClass === 'checkEdit') {
     app.loadChecksEditPage()
   }
+  if (primaryClass === 'pizzaItems') {
+    app.loadMenuItems()
+  }
 }
 
 app.loadAccountEditPage = () => {
@@ -304,7 +310,7 @@ app.loadAccountEditPage = () => {
   }
 }
 
-app.loadChecksListPage = function () {
+app.loadChecksListPage = () => {
   const email = typeof app.config.sessionToken.email === 'string' ? app.config.sessionToken.email : false
   if (email) {
     const queryStringObject = {
@@ -355,7 +361,7 @@ app.loadChecksListPage = function () {
   }
 }
 
-app.loadChecksEditPage = function () {
+app.loadChecksEditPage = () => {
   const id = typeof window.location.href.split('=')[1] === 'string' && window.location.href.split('=')[1].length > 0 ? window.location.href.split('=')[1] : false
   if (id) {
     const queryStringObject = {
@@ -398,6 +404,29 @@ app.tokenRenewalLoop = () => {
       }
     })
   }, 1000 * 60)
+}
+
+app.loadMenuItems = () => {
+  app.client.request(undefined, 'api/menu', 'GET', undefined, undefined, (status, response) => {
+    if (status === 200) {
+      const items = typeof response === 'object' && response instanceof Object ? response : []
+      console.log({ items })
+      for (const key in items) {
+        const item = items[key]
+        const table = document.getElementById('itemsListTable')
+        const tr = table.insertRow(-1)
+        tr.classList.add('checkRow')
+        const td0 = tr.insertCell(0)
+        const td1 = tr.insertCell(1)
+        const td2 = tr.insertCell(2)
+        td0.innerHTML = item.code
+        td1.innerHTML = item.name
+        td2.innerHTML = item.price
+      }
+    } else {
+      console.log('Error trying to load menu')
+    }
+  })
 }
 
 app.init = () => {
