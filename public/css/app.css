@@ -101,6 +101,18 @@ h2 {
 	padding: 0 0 20px 0;
 }
 
+h3 {
+	text-align: center;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 0 0 20px 0;
+	margin-top: 30px;
+}
+
+.center {
+	text-align: center;
+}
+
 .dangerZone {
 	border: 2px solid #c83737;
 	border-radius: 4px;
@@ -312,6 +324,23 @@ td a, td a:hover, td a:active {
 	display: none;
 }
 
+
+#shoppingCart {
+	padding: 0;
+}
+
+#shoppingCart li {
+	list-style: none;
+	line-height: 2em;
+}
+
+.cartButton {
+	padding: 3px;
+	border: 1px solid #21643c;
+	border-radius: 6px;
+	cursor: pointer;
+	background-color: #21db6a;
+}
 /*
 	Generic body
  */

@@ -281,6 +281,9 @@ app.loadDataOnPage = () => {
   if (primaryClass === 'pizzaItems') {
     app.loadMenuItems()
   }
+  if (primaryClass === 'pizzaShopping') {
+    app.loadShoppingCart()
+  }
 }
 
 app.loadAccountEditPage = () => {
@@ -410,7 +413,6 @@ app.loadMenuItems = () => {
   app.client.request(undefined, 'api/menu', 'GET', undefined, undefined, (status, response) => {
     if (status === 200) {
       const items = typeof response === 'object' && response instanceof Object ? response : []
-      console.log({ items })
       for (const key in items) {
         const item = items[key]
         const table = document.getElementById('itemsListTable')
@@ -419,12 +421,56 @@ app.loadMenuItems = () => {
         const td0 = tr.insertCell(0)
         const td1 = tr.insertCell(1)
         const td2 = tr.insertCell(2)
+        const td3 = tr.insertCell(3)
         td0.innerHTML = item.code
         td1.innerHTML = item.name
         td2.innerHTML = item.price
+        td3.innerHTML = `<form action="/api/shopping-cart" class="addShoppingCart" method="post">
+					<input type="hidden" name="code" value="${item.code}">
+					<select name="quantity" style="width: 60px;">
+						<option value="1">1</option>
+						<option value="2">2</option>
+						<option value="3">3</option>
+						<option value="4">4</option>
+						<option value="5">5</option>
+					</select>
+					<button type="submit" class="cartButton">Agregar al carrito</button>
+				</form>`
       }
     } else {
       console.log('Error trying to load menu')
+    }
+  })
+}
+
+app.loadShoppingCart = () => {
+  app.client.request(undefined, 'api/shopping-cart', 'GET', undefined, undefined, (status, response) => {
+    if (status === 200) {
+      console.log({ status, response })
+
+      const items = typeof response.data === 'object' && response.data instanceof Object ? response.data : []
+      const quantity = typeof response.quantity === 'number' && response.quantity > 0 ? response.quantity : 0
+      const total = typeof response.total === 'number' && response.total > 0 ? response.total : 0
+      for (const key in items) {
+        const item = items[key]
+        const table = document.getElementById('shoppingCartListTable')
+        const tr = table.insertRow(-1)
+        tr.classList.add('checkRow')
+        const td0 = tr.insertCell(0)
+        const td1 = tr.insertCell(1)
+        const td2 = tr.insertCell(2)
+        const td3 = tr.insertCell(3)
+        const td4 = tr.insertCell(4)
+        td0.innerHTML = item.id
+        td1.innerHTML = item.name
+        td2.innerHTML = item.price
+        td3.innerHTML = item.quantity
+        td4.innerHTML = item.total
+      }
+      document.getElementById('shoppingCartQuantity').innerHTML = quantity
+      document.getElementById('shoppingCartTotal').innerHTML = total
+    } else {
+      console.log('Error trying to load orders')
     }
   })
 }
