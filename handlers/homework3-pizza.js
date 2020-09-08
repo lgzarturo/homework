@@ -166,4 +166,33 @@ handlers.payment = (req, callback) => {
   }
 }
 
+/**
+ * URI /payment - Confirmación sobre el envio de correo
+ * @param req
+ * @param callback
+ */
+handlers.send = (req, callback) => {
+  if (req.method !== 'get') {
+    callback(405, undefined, 'html')
+  } else {
+    const data = {
+      'body.class': 'pizzaSendPayment',
+    }
+
+    helpers.getTemplate('pizza/send', data, (err, str) => {
+      if (!err && str) {
+        helpers.applyLayout(str, data, (errLayout, content) => {
+          if (!errLayout && content) {
+            callback(200, content, 'html')
+          } else {
+            callback(500, undefined, 'html')
+          }
+        })
+      } else {
+        callback(404, undefined, 'html')
+      }
+    })
+  }
+}
+
 module.exports = handlers

@@ -348,3 +348,19 @@ body {
 	font-family: "Comic Sans MS", sans-serif;
 	font-size: 16px;
 }
+
+/*
+	Mensaje
+ */
+
+#messageInput {
+	border-radius: 10px;
+	padding: 20px;
+	border: 4px solid #757474;
+	background-color: #cccccc;
+	color: #757474;
+}
+
+#messageInput code {
+	display: none;
+}

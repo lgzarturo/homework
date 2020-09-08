@@ -294,6 +294,12 @@ app.loadDataOnPage = () => {
   if (primaryClass === 'pizzaPayment') {
     app.loadShoppingCartDetails()
   }
+  if (primaryClass === 'pizzaOrder') {
+    app.loadOrders()
+  }
+  if (primaryClass === 'pizzaSendPayment') {
+    app.loadOrder()
+  }
 }
 
 app.loadAccountEditPage = () => {
@@ -506,6 +512,62 @@ app.loadShoppingCartDetails = () => {
       console.log('Error trying to load orders')
     }
   })
+}
+
+app.loadOrders = () => {
+  app.client.request(undefined, 'api/payments', 'GET', undefined, undefined, (status, response) => {
+    console.log({ status })
+    console.log({ response })
+    if (status === 200) {
+      const items = typeof response === 'object' && response instanceof Object ? response : []
+      for (const key in items) {
+        const item = items[key]
+        const table = document.getElementById('ordersListTable')
+        const tr = table.insertRow(-1)
+        tr.classList.add('checkRow')
+        const td0 = tr.insertCell(0)
+        const td1 = tr.insertCell(1)
+        const td2 = tr.insertCell(2)
+        const td3 = tr.insertCell(3)
+        const td4 = tr.insertCell(4)
+        const td5 = tr.insertCell(5)
+        td0.innerHTML = `<a href="/pizza/send/order?id=${item.payload.orderId}" title="Send email Confirmation">${item.payload.orderId}</a>`
+        td1.innerHTML = item.email
+        td2.innerHTML = item.items
+        td3.innerHTML = item.payload.items
+        td4.innerHTML = `$${parseInt(item.payload.amount, 10) / 100}`
+        td5.innerHTML = item.payload.description
+      }
+      console.log({ items })
+    } else {
+      console.log('Error trying to load orders')
+    }
+  })
+}
+
+app.loadOrder = () => {
+  const id = typeof window.location.href.split('=')[1] === 'string' && window.location.href.split('=')[1].length > 0 ? window.location.href.split('=')[1] : false
+  if (id) {
+    const queryStringObject = {
+      order: id,
+    }
+    app.client.request(undefined, 'api/payments', 'GET', queryStringObject, undefined, (status, responsePayload) => {
+      if (status === 200) {
+        document.querySelector('#orderIdInput').innerHTML = `${responsePayload.payload.orderId}`
+        document.querySelector('#descriptionInput').innerHTML = `${responsePayload.payload.description}`
+        document.querySelector('#paymentInput').innerHTML = `${responsePayload.payload.cc} (${responsePayload.payload.month}/${responsePayload.payload.year})`
+        document.querySelector('#sendEmailPayment .orderId').value = `${responsePayload.payload.orderId}`
+        document.querySelector('#sendEmailPayment .nameInput').value = responsePayload.user.name
+        document.querySelector('#sendEmailPayment .emailInput').value = responsePayload.email
+        document.querySelector('#sendEmailPayment .streetAddressInput').value = responsePayload.user.streetAddress
+        document.querySelector('#messageInput').innerHTML = `${responsePayload.message}`
+      } else {
+        console.log('Error trying to load menu')
+      }
+    })
+  } else {
+    window.location = '/pizza/order'
+  }
 }
 
 app.init = () => {

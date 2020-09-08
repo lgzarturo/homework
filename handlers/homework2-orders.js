@@ -39,33 +39,57 @@ handlers._payments.get = (req, callback) => {
   const token = validators.isValidTokenField(req.headers.token)
   const email = validators.isValidEmailField(req.headers.email)
   const order = validators.isValidTextField(req.queryStringObject.order)
+  const send = validators.isValidTextField(req.queryStringObject.send)
 
   helpers.verifyToken(token, email, (isValid) => {
     if (isValid) {
-      data.read('payments', order, (errRead, dataOrder) => {
-        const message = `
-          <p>Pago procesado con la tarjeta '${dataOrder.payload.cc}' (${dataOrder.payload.source})</p>
-          <h3>Descripción</h3>
-          <ul>
-            <li>Cantidad: ${dataOrder.payload.items}</li>
-            <li>Total: ${dataOrder.payload.amount / 100} ${dataOrder.payload.currency}</li>
-          </ul>
-          <hr/>
-          <pre>
-          ${dataOrder.message}
-          </pre>
-          <hr/>
-          Gracias por su pago
-        `
+      if (order) {
+        if (send) {
+          data.read('payments', order, (errRead, dataOrder) => {
+            const message = `
+						<p>Pago procesado con la tarjeta '${dataOrder.payload.cc}' (${dataOrder.payload.source})</p>
+						<h3>Descripción</h3>
+						<ul>
+							<li>Cantidad: ${dataOrder.payload.items}</li>
+							<li>Total: ${dataOrder.payload.amount / 100} ${dataOrder.payload.currency}</li>
+						</ul>
+						<hr/>
+						<pre>
+						${dataOrder.message}
+						</pre>
+						<hr/>
+						Gracias por su pago
+        	`
 
-        helpers.mailgun(email, `Orden #${order}`, message, (errMailgun) => {
-          if (!errMailgun) {
-            callback(200, { success: helpers.translate('success.sent.payment.confirm', req.lang) })
+            helpers.mailgun(email, `Orden #${order}`, message, (errMailgun) => {
+              if (!errMailgun) {
+                callback(200, { success: helpers.translate('success.sent.payment.confirm', req.lang) })
+              } else {
+                callback(500, { error: helpers.translate('error.sent.payment.confirm', req.lang) })
+              }
+            })
+          })
+        } else {
+          data.read('payments', order, (errRead, dataOrder) => {
+            if (!errRead) {
+              callback(200, dataOrder)
+            } else {
+              callback(500, { error: helpers.translate('error.sent.payment.confirm', req.lang) })
+            }
+          })
+        }
+      } else {
+        // Obtener todas las ordenes
+        data.listAndRead('payments', (err, items) => {
+          if (!err) {
+            callback(200, items)
           } else {
-            callback(500, { error: helpers.translate('error.sent.payment.confirm', req.lang) })
+            callback(404, 'No hay pagos realizados')
           }
         })
-      })
+      }
+    } else {
+      callback(401, { error: helpers.translate('error.token.invalid', req.lang) })
     }
   })
 }
