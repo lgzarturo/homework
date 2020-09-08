@@ -5,6 +5,7 @@
 
 // Dependencias libs
 const helpers = require('../lib/helpers')
+const validators = require('../validation/request_validation')
 // Controlador dependiendo la solicitud URI
 const handlers = {}
 
@@ -25,6 +26,38 @@ handlers.items = (req, callback) => {
     }
 
     helpers.getTemplate('pizza/items', data, (err, str) => {
+      if (!err && str) {
+        helpers.applyLayout(str, data, (errLayout, content) => {
+          if (!errLayout && content) {
+            callback(200, content, 'html')
+          } else {
+            callback(500, undefined, 'html')
+          }
+        })
+      } else {
+        callback(404, undefined, 'html')
+      }
+    })
+  }
+}
+
+/**
+ * URI /add - Agregar items al menu
+ * @param req
+ * @param callback
+ */
+handlers.add = (req, callback) => {
+  if (req.method !== 'get') {
+    callback(405, undefined, 'html')
+  } else {
+    const data = {
+      'head.title': helpers.translate('pizza.add.item.page.title', req.lang),
+      'head.description': helpers.translate('pizza.add.item.page.description', req.lang),
+      'body.title': helpers.translate('pizza.add.item.title', req.lang),
+      'body.class': 'pizzaAddItem',
+    }
+
+    helpers.getTemplate('pizza/add', data, (err, str) => {
       if (!err && str) {
         helpers.applyLayout(str, data, (errLayout, content) => {
           if (!errLayout && content) {

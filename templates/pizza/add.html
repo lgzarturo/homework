@@ -1,0 +1,53 @@
+<h1>{body.title}</h1>
+<h2>{head.description}</h2>
+
+<hr />
+
+<h2>Add item <span id="itemName" style="font-weight: bold; font-style: italic"></span>to shopping cart</h2>
+
+<div class="formWrapper">
+	<form id="shoppingCartAddItem" action="/api/shopping-cart" method="POST">
+		<input type="hidden" name="_method" value="POST"/>
+		<div class="formError"></div>
+		<div class="formSuccess">Your Changes Have Been Saved</div>
+		<input class="codeHiddenInput" type="hidden" name="code" />
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Code</div>
+			<label>
+				<input class="disabled codeInput" type="text" name="itemCode" disabled data-ignore="true" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Item</div>
+			<label>
+				<input class="disabled nameInput" type="text" name="name" disabled data-ignore="true" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Price</div>
+			<label>
+				<input class="disabled priceInput" type="text" name="price" disabled data-ignore="true" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Quantity</div>
+			<label>
+				<select class="quantityInput intval" name="quantity">
+					<option value="1">1</option>
+					<option value="2">2</option>
+					<option value="3">3</option>
+					<option value="4">4</option>
+					<option value="5">5</option>
+				</select>
+			</label>
+		</div>
+
+		<div class="inputWrapper ctaWrapper">
+			<button type="submit" class="cta green">Add Shopping Cart</button>
+		</div>
+	</form>
+</div>

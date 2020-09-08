@@ -139,6 +139,9 @@ app.bindForms = () => {
           }
         }
 
+        console.log({ payload })
+        console.log({ method })
+        console.log({ path })
         app.client.request(undefined, path, method, queryStrings, payload, (statusCode, responsePayload) => {
           if (statusCode >= 200 && statusCode <= 226) {
             app.formResponseProcessor(formId, payload, responsePayload)
@@ -194,6 +197,10 @@ app.formResponseProcessor = (formId, requestPayload, responsePayload) => {
 
   if (formId === 'checksCreate') {
     window.location = '/checks/all'
+  }
+
+  if (formId === 'shoppingCartAddItem') {
+    window.location = '/pizza/shopping'
   }
 }
 
@@ -280,6 +287,9 @@ app.loadDataOnPage = () => {
   }
   if (primaryClass === 'pizzaItems') {
     app.loadMenuItems()
+  }
+  if (primaryClass === 'pizzaAddItem') {
+    app.loadMenuItem()
   }
   if (primaryClass === 'pizzaShopping') {
     app.loadShoppingCart()
@@ -425,17 +435,7 @@ app.loadMenuItems = () => {
         td0.innerHTML = item.code
         td1.innerHTML = item.name
         td2.innerHTML = item.price
-        td3.innerHTML = `<form action="/api/shopping-cart" class="addShoppingCart" method="post">
-					<input type="hidden" name="code" value="${item.code}">
-					<select name="quantity" style="width: 60px;">
-						<option value="1">1</option>
-						<option value="2">2</option>
-						<option value="3">3</option>
-						<option value="4">4</option>
-						<option value="5">5</option>
-					</select>
-					<button type="submit" class="cartButton">Agregar al carrito</button>
-				</form>`
+        td3.innerHTML = `<a href="/pizza/add?id=${item.code}">Agregar item</a>`
       }
     } else {
       console.log('Error trying to load menu')
@@ -443,11 +443,31 @@ app.loadMenuItems = () => {
   })
 }
 
+app.loadMenuItem = () => {
+  const id = typeof window.location.href.split('=')[1] === 'string' && window.location.href.split('=')[1].length > 0 ? window.location.href.split('=')[1] : false
+  if (id) {
+    const queryStringObject = {
+      code: id,
+    }
+    app.client.request(undefined, 'api/menu', 'GET', queryStringObject, undefined, (status, responsePayload) => {
+      if (status === 200) {
+        document.querySelector('#itemName').innerHTML = `"${responsePayload.name} - $${responsePayload.price}" `
+        document.querySelector('#shoppingCartAddItem .codeHiddenInput').value = responsePayload.code
+        document.querySelector('#shoppingCartAddItem .codeInput').value = responsePayload.code
+        document.querySelector('#shoppingCartAddItem .nameInput').value = responsePayload.name
+        document.querySelector('#shoppingCartAddItem .priceInput').value = responsePayload.price
+      } else {
+        console.log('Error trying to load menu')
+      }
+    })
+  } else {
+    window.location = '/pizza/menu'
+  }
+}
+
 app.loadShoppingCart = () => {
   app.client.request(undefined, 'api/shopping-cart', 'GET', undefined, undefined, (status, response) => {
     if (status === 200) {
-      console.log({ status, response })
-
       const items = typeof response.data === 'object' && response.data instanceof Object ? response.data : []
       const quantity = typeof response.quantity === 'number' && response.quantity > 0 ? response.quantity : 0
       const total = typeof response.total === 'number' && response.total > 0 ? response.total : 0
@@ -476,11 +496,11 @@ app.loadShoppingCart = () => {
 }
 
 app.init = () => {
+  app.getSessionToken()
+  app.loadDataOnPage()
   app.bindForms()
   app.bindLogoutButton()
-  app.getSessionToken()
   app.tokenRenewalLoop()
-  app.loadDataOnPage()
 }
 
 window.onload = () => {
