@@ -51,9 +51,6 @@ handlers.add = (req, callback) => {
     callback(405, undefined, 'html')
   } else {
     const data = {
-      'head.title': helpers.translate('pizza.add.item.page.title', req.lang),
-      'head.description': helpers.translate('pizza.add.item.page.description', req.lang),
-      'body.title': helpers.translate('pizza.add.item.title', req.lang),
       'body.class': 'pizzaAddItem',
     }
 
@@ -74,7 +71,7 @@ handlers.add = (req, callback) => {
 }
 
 /**
- * URI /order - Crea el registro de la orden, se puede verificar el estado de la orden
+ * URI /order - Listado de pagos realizados
  * @param req
  * @param callback
  */

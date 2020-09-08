@@ -139,9 +139,6 @@ app.bindForms = () => {
           }
         }
 
-        console.log({ payload })
-        console.log({ method })
-        console.log({ path })
         app.client.request(undefined, path, method, queryStrings, payload, (statusCode, responsePayload) => {
           if (statusCode >= 200 && statusCode <= 226) {
             app.formResponseProcessor(formId, payload, responsePayload)
@@ -293,6 +290,9 @@ app.loadDataOnPage = () => {
   }
   if (primaryClass === 'pizzaShopping') {
     app.loadShoppingCart()
+  }
+  if (primaryClass === 'pizzaPayment') {
+    app.loadShoppingCartDetails()
   }
 }
 
@@ -489,6 +489,19 @@ app.loadShoppingCart = () => {
       }
       document.getElementById('shoppingCartQuantity').innerHTML = quantity
       document.getElementById('shoppingCartTotal').innerHTML = total
+    } else {
+      console.log('Error trying to load orders')
+    }
+  })
+}
+
+app.loadShoppingCartDetails = () => {
+  app.client.request(undefined, 'api/shopping-cart', 'GET', undefined, undefined, (status, response) => {
+    if (status === 200) {
+      const quantity = typeof response.quantity === 'number' && response.quantity > 0 ? response.quantity : 0
+      const total = typeof response.total === 'number' && response.total > 0 ? response.total : 0
+      document.getElementById('totalItems').innerHTML = `Total items: ${quantity}`
+      document.getElementById('totalAmount').innerHTML = `Total amount: $${total}`
     } else {
       console.log('Error trying to load orders')
     }
