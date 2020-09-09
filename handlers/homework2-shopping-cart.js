@@ -71,6 +71,8 @@ handlers._shopping.post = (req, callback) => {
   const code = validators.isValidTextField(req.payload.code)
   const quantity = validators.isValidNumberField(req.payload.quantity)
 
+  console.log({ token, email, code, quantity })
+
   helpers.verifyToken(token, email, (isValid) => {
     if (isValid) {
       if (code && quantity) {
@@ -78,7 +80,6 @@ handlers._shopping.post = (req, callback) => {
           if (!errRead && itemData) {
             const item = itemData[code]
             if (typeof item !== 'undefined') {
-              console.log({ item })
               const totalItem = quantity * item.price
               let totalItems = 0
               let quantityItems = 0

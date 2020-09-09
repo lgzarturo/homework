@@ -1,0 +1,69 @@
+<h1>{body.title}</h1>
+<h2>{head.description}</h2>
+
+<hr />
+
+<a href="/pizza/menu" class="backButton">Go to Menu</a>
+
+<hr />
+
+<div class="formWrapper">
+	<form id="makePayment" action="/api/payments" method="POST">
+		<input type="hidden" name="_method" value="POST"/>
+		<div class="formError"></div>
+		<div class="formSuccess">Pago exitoso</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Order details</div>
+			<ul>
+				<li id="totalItems">Total items:</li>
+				<li id="totalAmount">Total amount:</li>
+			</ul>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Credit Card</div>
+			<label>
+				<input class="creditCardInput" type="text" name="creditCard" value="4242424242424242" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Valid month</div>
+			<label>
+				<select class="intval" name="validMonth">
+					<option value="1">January</option>
+					<option value="2">February</option>
+					<option value="3">March</option>
+					<option value="4">April</option>
+					<option value="5">May</option>
+					<option value="6">June</option>
+					<option value="7">July</option>
+					<option value="8">August</option>
+					<option value="9">September</option>
+					<option value="10">October</option>
+					<option value="11">November</option>
+					<option value="12">December</option>
+				</select>
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Valid Year</div>
+			<label>
+				<input class="validYearInput intval" type="text" name="validYear" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">3 digit CVV</div>
+			<label>
+				<input class="codeCardInput intval" type="text" name="codeCard" />
+			</label>
+		</div>
+
+		<div class="inputWrapper ctaWrapper">
+			<button type="submit" class="cta green">Add Shopping Cart</button>
+		</div>
+	</form>
+</div>

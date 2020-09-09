@@ -1,0 +1,81 @@
+<h1>{body.title}</h1>
+
+<hr />
+
+<h2>Edit your account details</h2>
+
+<div class="formWrapper">
+	<form id="accountEdit1" action="/api/users" method="PUT">
+		<input type="hidden" name="_method" value="PUT"/>
+		<div class="formError"></div>
+		<div class="formSuccess">Your Changes Have Been Saved</div>
+		<input class="hiddenEmailInput" type="hidden" name="email" data-query="true" />
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Email</div>
+			<label>
+				<input class="disabled emailInput" type="email" name="displayEmail" placeholder="email@domain.com" disabled data-ignore="true" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Full Name</div>
+			<label>
+				<input class="fullNameInput" type="text" name="name" placeholder="John Doe" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Phone</div>
+			<label>
+				<input class="displayPhoneInput" type="text" name="phone" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Address</div>
+			<label>
+				<textarea class="displayAddressInput" name="streetAddress"></textarea>
+			</label>
+		</div>
+
+		<div class="inputWrapper ctaWrapper">
+			<button type="submit" class="cta green">Save Changes</button>
+		</div>
+	</form>
+</div>
+
+<hr />
+<h2>Change Your Password</h2>
+<div class="formWrapper">
+	<form id="accountEdit2" action="/api/users" method="PUT">
+		<input type="hidden" name="_method" value="PUT"/>
+		<div class="formError"></div>
+		<div class="formSuccess">Your New Password Has Been Saved</div>
+		<input class="hiddenEmailInput" type="hidden" name="email" data-query="true" />
+		<div class="inputWrapper">
+			<div class="inputLabel">Choose a New Password</div>
+			<label>
+				<input type="password" name="password" placeholder="Make it a good one!" />
+			</label>
+		</div>
+		<div class="inputWrapper ctaWrapper">
+			<button type="submit" class="cta green">Save Password</button>
+		</div>
+	</form>
+</div>
+
+<div class="dangerZone">
+	<h2>Delete Your Account</h2>
+	<div class="formWrapper">
+		<form id="accountEdit3" action="/api/users" method="DELETE">
+			<input type="hidden" name="_method" value="DELETE"/>
+			<div class="formError"></div>
+			<div class="warning">Warning: This action cannot be undone. Dont click this button on accident!</div>
+			<input class="hiddenEmailInput" type="hidden" name="email" data-query="true" />
+			<div class="inputWrapper ctaWrapper">
+				<button type="submit" class="cta red">Delete Account</button>
+			</div>
+		</form>
+	</div>
+</div>

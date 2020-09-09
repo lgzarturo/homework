@@ -37,10 +37,17 @@ handlers._users.post = (req, callback) => {
   // Validar los parámetros de la solicitud.
   const name = validators.isValidTextField(req.payload.name)
   const email = validators.isValidEmailField(req.payload.email)
+  const phone = validators.isValidTextField(req.payload.phone, true)
   const password = validators.isValidPasswordField(req.payload.password)
   const streetAddress = validators.isValidTextField(req.payload.streetAddress, true)
+  const tosAgreement = validators.isValidBooleanField(req.payload.tosAgreement)
 
-  if (name && email && password) {
+  if (tosAgreement === false) {
+    callback(409, { error: helpers.translate('error.terms.and.policy', req.lang) })
+    return
+  }
+
+  if (name && email && password && tosAgreement) {
     data.read('users', email, (errRead, userData) => {
       if (errRead && !userData) {
         const hashedPassword = helpers.hash(password)
@@ -48,8 +55,10 @@ handlers._users.post = (req, callback) => {
           const objectUser = {
             name: name,
             email: email,
+            phone: phone,
             password: hashedPassword,
             streetAddress: streetAddress,
+            tosAgreement: tosAgreement,
           }
           data.create('users', email, objectUser, (errCreate) => {
             if (!errCreate) {
@@ -81,10 +90,12 @@ handlers._users.get = (req, callback) => {
   const email = validators.isValidEmailField(req.queryStringObject.email)
   if (email) {
     const token = validators.isValidTokenField(req.headers.token)
+    console.log({ token })
     helpers.verifyToken(token, email, (isValid) => {
       if (isValid) {
         data.read('users', email, (errRead, userData) => {
           if (!errRead && userData) {
+            // eslint-disable-next-line no-param-reassign
             delete userData.password
             callback(200, userData)
           } else {
@@ -112,6 +123,8 @@ handlers._users.put = (req, callback) => {
   const password = validators.isValidPasswordField(req.payload.password)
   const streetAddress = validators.isValidTextField(req.payload.streetAddress, true)
 
+  console.log({ email, name, password, streetAddress })
+
   if (email) {
     const token = validators.isValidTokenField(req.headers.token)
     helpers.verifyToken(token, email, (isValid) => {
@@ -120,12 +133,15 @@ handlers._users.put = (req, callback) => {
           data.read('users', email, (errRead, userData) => {
             if (!errRead && userData) {
               if (name) {
+                // eslint-disable-next-line no-param-reassign
                 userData.name = name
               }
               if (password) {
+                // eslint-disable-next-line no-param-reassign
                 userData.password = helpers.hash(password)
               }
               if (streetAddress) {
+                // eslint-disable-next-line no-param-reassign
                 userData.streetAddress = streetAddress
               }
               data.update('users', email, userData, (errUpdate) => {

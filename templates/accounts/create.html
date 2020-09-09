@@ -1,0 +1,41 @@
+<h1>{body.title}</h1>
+<h2>{head.description}</h2>
+
+<div class="formWrapper">
+	<form id="accountCreate" action="/api/users" method="POST">
+		<div class="formError"></div>
+		<div class="inputWrapper">
+			<div class="inputLabel">Full Name</div>
+			<label>
+				<input type="text" name="name" placeholder="John Doe" />
+			</label>
+		</div>
+		<div class="inputWrapper">
+			<div class="inputLabel">Email</div>
+			<label>
+				<input type="email" name="email" placeholder="email@domain.com" />
+			</label>
+		</div>
+		<div class="inputWrapper">
+			<div class="inputLabel">Phone Number</div>
+			<label>
+				<input type="text" name="phone" placeholder="(415) 123-4567" />
+			</label>
+		</div>
+		<div class="inputWrapper">
+			<div class="inputLabel">Choose a Password</div>
+			<label>
+				<input type="password" name="password" placeholder="Make it a good one!" />
+			</label>
+		</div>
+		<div class="inputWrapper">
+			<div class="inputLabel">Do you agree to the terms and conditions?</div>
+			<label>
+				<input type="checkbox" name="tosAgreement" value="agree">
+			</label>
+		</div>
+		<div class="inputWrapper ctaWrapper">
+			<button type="submit" class="cta blue">Get Started</button>
+		</div>
+	</form>
+</div>

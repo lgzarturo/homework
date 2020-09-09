@@ -17,6 +17,13 @@ environments.staging = {
   tokenSize: 36,
   tokenDuration: 3600000,
   maxChecks: 5,
+  templateGlobals: {
+    appName: 'UptimeChecker',
+    companyName: 'NotRealCompany',
+    copyMessage: 'Todos los derechos reservados',
+    year: '2020',
+    baseUrl: 'http://localhost:3000/',
+  },
 }
 
 /**
@@ -31,6 +38,13 @@ environments.production = {
   tokenSize: 36,
   tokenDuration: 3600000,
   maxChecks: 5,
+  templateGlobals: {
+    appName: 'UptimeChecker',
+    companyName: 'NotRealCompany',
+    copyMessage: 'Todos los derechos reservados',
+    year: '2020',
+    baseUrl: 'http://localhost:5000/',
+  },
 }
 
 const currentEnvironment = typeof process.env.NODE_ENV === 'string' ? process.env.NODE_ENV.toLowerCase() : ''

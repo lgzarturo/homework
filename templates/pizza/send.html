@@ -1,0 +1,56 @@
+<h1>Payment Details</h1>
+<h2 id="orderIdInput"></h2>
+
+<hr />
+
+<a href="/pizza/order" class="backButton">Go to Orders</a>
+
+<hr />
+
+<div class="formWrapper">
+	<form id="sendEmailPayment" action="/api/payments" method="GET">
+		<input type="hidden" name="_method" value="GET"/>
+		<div class="formError"></div>
+		<div class="formSuccess">Envío por correo exitoso</div>
+		<input type="hidden" class="orderId" name="order" data-query="true">
+		<input type="hidden" name="send" value="true" data-query="true">
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Name</div>
+			<label>
+				<input class="nameInput disabled" type="text" name="name" disabled data-ignore="true" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Email</div>
+			<label>
+				<input class="emailInput disabled" type="text" name="email" disabled data-ignore="true" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Address</div>
+			<label>
+				<input class="streetAddressInput disabled" type="text" name="streetAddress" disabled data-ignore="true" />
+			</label>
+		</div>
+
+		<div class="inputWrapper">
+			<div class="inputLabel">Email Message</div>
+			<blockquote id="messageInput"></blockquote>
+		</div>
+
+		<hr>
+		<h2>Order Details</h2>
+
+		<div class="inputWrapper">
+			<blockquote id="descriptionInput"></blockquote>
+			<blockquote id="paymentInput"></blockquote>
+		</div>
+
+		<div class="inputWrapper ctaWrapper">
+			<button type="submit" class="cta green">Send confirmation email</button>
+		</div>
+	</form>
+</div>

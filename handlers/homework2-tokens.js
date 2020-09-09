@@ -35,6 +35,8 @@ handlers._tokens.post = (req, callback) => {
   const email = validators.isValidEmailField(req.payload.email)
   const password = validators.isValidPasswordField(req.payload.password)
 
+  console.log({ email, password })
+
   if (email && password) {
     data.read('users', email, (errRead, user) => {
       if (!errRead && user) {
@@ -105,6 +107,7 @@ handlers._tokens.put = (req, callback) => {
     data.read('tokens', token, (err, dataToken) => {
       if (!err && dataToken) {
         if (dataToken.expires > Date.now()) {
+          // eslint-disable-next-line no-param-reassign
           dataToken.expires = Date.now() + config.tokenDuration
           data.update('tokens', token, dataToken, (errUpdate) => {
             if (!errUpdate) {

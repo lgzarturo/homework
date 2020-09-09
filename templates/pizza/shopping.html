@@ -1,0 +1,32 @@
+<h1>{body.title}</h1>
+<h2>{head.description}</h2>
+
+<hr />
+
+<h3>Artículos en el carrito</h3>
+
+
+<table id="shoppingCartListTable">
+	<tr>
+		<th>Code</th>
+		<th>Name</th>
+		<th>Price</th>
+		<th>Quantity</th>
+		<th>Total</th>
+	</tr>
+	<tr id="noChecksMessage">
+		<td colspan="5">You have no items!</td>
+	</tr>
+</table>
+
+<h3>Detalle de la orden</h3>
+
+<div class="center">
+	<ul id="shoppingCart">
+		<li>Quantity: <span id="shoppingCartQuantity"></span></li>
+		<li>Total: $<span id="shoppingCartTotal"></span></li>
+	</ul>
+
+	<a href="/pizza/menu" class="cta green">Seguir comprando</a>
+	<a href="/pizza/payment" class="cta blue">Realizar el pago</a>
+</div>

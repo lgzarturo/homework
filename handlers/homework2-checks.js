@@ -35,12 +35,13 @@ handlers._checks.post = (req, callback) => {
   // Validar los parámetros de la solicitud
   const protocol = validators.isValidProtocolValue(req.payload.protocol)
   const url = validators.isValidTextField(req.payload.url)
-  const method = validators.isValidMethodValue(req.payload.method)
+  const method = validators.isValidMethodValue(req.payload.httpmethod)
   const successCodes = validators.isValidArrayObject(req.payload.successCodes)
   const timeoutSeconds = validators.isValidTimeInSeconds(req.payload.timeoutSeconds)
 
   if (protocol && url && method && successCodes && timeoutSeconds) {
     const token = validators.isValidTokenField(req.headers.token)
+
     if (token) {
       data.read('tokens', token, (errRead, tokenData) => {
         if (!errRead && tokenData) {
@@ -64,6 +65,7 @@ handlers._checks.post = (req, callback) => {
                 data.create('checks', checkId, checkObject, (errCreate) => {
                   if (!errCreate) {
                     // Agregar el check al usuario
+                    // eslint-disable-next-line no-param-reassign
                     userData.checks = userChecks
                     userData.checks.push(checkId)
                     data.update('users', userEmail, userData, (errUpdate) => {
@@ -88,6 +90,8 @@ handlers._checks.post = (req, callback) => {
           callback(403)
         }
       })
+    } else {
+      callback(403, { error: helpers.translate('error.user.forbidden.permissions', req.lang) })
     }
   } else {
     callback(400, {
@@ -104,7 +108,6 @@ handlers._checks.post = (req, callback) => {
 handlers._checks.get = (req, callback) => {
   // Validar los parámetros de la solicitud.
   const id = validators.isValidTextFieldSize(req.queryStringObject.id, 48)
-  console.log({ id })
   if (id) {
     data.read('checks', id, (err, checkData) => {
       if (!err && checkData) {
@@ -147,18 +150,23 @@ handlers._checks.put = (req, callback) => {
           helpers.verifyToken(token, checkData.userEmail, (isValid) => {
             if (isValid) {
               if (protocol) {
+                // eslint-disable-next-line no-param-reassign
                 checkData.protocol = protocol
               }
               if (url) {
+                // eslint-disable-next-line no-param-reassign
                 checkData.url = url
               }
               if (method) {
+                // eslint-disable-next-line no-param-reassign
                 checkData.method = method
               }
               if (successCodes) {
+                // eslint-disable-next-line no-param-reassign
                 checkData.successCodes = successCodes
               }
               if (timeoutSeconds) {
+                // eslint-disable-next-line no-param-reassign
                 checkData.timeoutSeconds = timeoutSeconds
               }
               data.update('checks', id, checkData, (err) => {
