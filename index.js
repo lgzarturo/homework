@@ -5,6 +5,7 @@
 // Dependencias libs
 const server = require('./lib/server')
 const workers = require('./lib/workers')
+const cli = require('./lib/cli')
 
 // Aplicación
 const app = {}
@@ -14,6 +15,9 @@ app.init = function () {
   // Ejecuta el servidor
   server.init()
   workers.init()
+  setTimeout(() => {
+    cli.init()
+  }, 50)
 }
 
 // Iniciar la aplicación
