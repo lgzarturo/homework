@@ -48,6 +48,7 @@ handlers._tokens.post = (req, callback) => {
             email: email,
             token: token,
             expires: expires,
+            created: new Date(),
           }
 
           data.create('tokens', token, object, (errCreate) => {

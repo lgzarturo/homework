@@ -88,4 +88,14 @@ validators._isValidValueInArray = (value, options) => {
   return typeof value === 'string' && options.indexOf(value) !== -1 ? value : false
 }
 
+validators.thisFileContainsValidData = (value) => {
+  if (value === '.DS_Store') {
+    return false
+  }
+  if (value.includes('.md')) {
+    return false
+  }
+  return true
+}
+
 module.exports = validators
